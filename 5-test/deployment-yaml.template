@@ -1,0 +1,29 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: ${instance_name}
+  namespace: ${test_namespace}
+  labels:
+    app: ${instance_name}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ${instance_name}
+  template:
+    metadata:
+      labels:
+        app: ${instance_name}
+    spec:
+      nodeSelector:
+        beta.kubernetes.io/instance-type: "${test_instance_type}"
+      containers:
+      - name: main
+        image: "${registry}${test_image_name}${test_image_tag}"
+        command: ["bash","-c","${cmd_pod}"]
+        imagePullPolicy: Always
+        resources:
+          limits:
+            cpu: 1
+

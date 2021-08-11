@@ -1,0 +1,23 @@
+FROM amazonlinux:2
+
+LABEL description="Base container for Inferentia models"
+
+ENV PYTHONUNBUFFERED=TRUE
+
+ENV PYTHONDONTWRITEBYTECODE=TRUE
+
+ADD ./1-build/etc /etc
+    
+RUN rpm --import https://yum.repos.neuron.amazonaws.com/GPG-PUB-KEY-AMAZON-AWS-NEURON.PUB
+
+RUN yum update -y && \
+    yum install -y python3 python3-devel gcc-c++ && \
+    yum install -y tar gzip ca-certificates procps net-tools which vim wget libgomp htop jq bind-utils bc && \
+    yum install -y aws-neuron-runtime-base aws-neuron-runtime aws-neuron-tools
+    
+RUN pip3 install --upgrade --force-reinstall --no-cache-dir neuron-cc[tensorflow] torch-neuron transformers==4.2.0 --extra-index-url=https://pip.repos.neuron.amazonaws.com
+
+RUN pip3 install --no-cache-dir torchserve==0.3.0 torch-model-archiver==0.3.0 configparser
+
+RUN alternatives --install /usr/bin/python python /usr/bin/python3 1; alternatives --install /usr/bin/pip pip /usr/bin/pip3 1
+
