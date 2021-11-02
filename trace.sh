@@ -33,7 +33,7 @@ if [ "$1" == "" ]; then
 			;;
 		"inf")
 			echo "   ... for inf ..."
-			docker run -it --rm -v $(pwd)/2-trace:/app/trace -v $(pwd)/config.properties:/app/config.properties ${registry}${base_image_name}${base_image_tag} bash -c "cd /app/trace; python model-tracer.py"
+			docker run -it --rm -e AWS_NEURON_VISIBLE_DEVICES=ALL --privileged -v $(pwd)/2-trace:/app/trace -v $(pwd)/config.properties:/app/config.properties ${registry}${base_image_name}${base_image_tag} bash -c "cd /app/trace; python model-tracer.py"
 			;;
 		*)
 			echo "Please ensure cpu, gpu, or inf is configure as processor in config.properties"
