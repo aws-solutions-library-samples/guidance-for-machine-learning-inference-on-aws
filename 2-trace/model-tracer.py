@@ -22,7 +22,7 @@ import os
 # 1. READ config.properties
 print("\nParsing configuration ...")
 path_prefix = os.path.dirname(__file__)
-with open(path_prefix + '/../config.properties') as f:
+with open(path_prefix + '../config.properties') as f:
     config_lines = '[global]\n' + f.read()
     f.close()
 config = ConfigParser()
