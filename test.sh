@@ -11,7 +11,7 @@ print_help() {
     echo ""
     echo "Usage: $0 <arg>"
     echo ""
-    echo "   This script is used for building, deploying, executin, and managing performance and benchmark tests"
+    echo "   This script is used for building, deploying, executing, and managing performance and benchmark tests"
     echo "   against model servers and models running on the configured container runtime."
     echo ""
     echo "   Available arguments:"
