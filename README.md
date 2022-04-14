@@ -13,6 +13,14 @@ Fig. 1 - Sample EKS infrastructure for inference workloads
 
 The inference workloads in this sample project are deployed on the CPU, GPU, or Inferentia nodes as shown on Fig. 1. The control scripts run in any location that has access to the cluster API. To eliminate latency concern related to the cluster ingress, load tests run in a pod within the cluster and send requests to the models directly through the cluster pod network.
 
+<center>
+<a href="https://www.youtube.com/watch?v=g9XRhGhQhAE"><img src="./aws-do-inference-video.png" width="90%"></a> </br>
+
+Fig. 2 - aws-do-inference video walkthrough
+</center>
+
+See an end-to-end accelerated [video walkthrough](https://bit.ly/aws-do-inference-video) (7 min) or follow the instructions below to build and run your own inference solution.
+
 ## Prerequisites
 It is assumed that an [EKS cluster exists](https://github.com/aws-samples/aws-do-eks) and contains nodegroups of the desired target instance types.
 In addition it is assumed that the following basic tools are present: [docker](https://docs.docker.com/get-docker/), [kubectl](https://kubernetes.io/docs/tasks/tools/), [envsubst](https://command-not-found.com/envsubst), [kubetail](https://github.com/johanhaleby/kubetail), [bc](https://howtoinstall.co/en/bc).
