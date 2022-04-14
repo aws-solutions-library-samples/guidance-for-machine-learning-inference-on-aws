@@ -5,19 +5,21 @@ While this example focuses on one processor target at a time, iterating over the
 enables hybrid deployments where the best processor/accelerator is used to serve each model depending on its resource consumption profile.
 In this sample repository, we use a [bert-base](https://huggingface.co/distilbert-base-multilingual-cased) NLP model from [huggingface.co](https://huggingface.co/), however the project structure and workflow is generic and can be adapted for use with other models.
 
-<center>
-<img src="./aws-do-inference.png" width="90%"> </br>
-
+<div align="center">
+<img src="./aws-do-inference.png" width="90%">
+<br/>
 Fig. 1 - Sample EKS infrastructure for inference workloads
-</center>
+</div>
+<br/>
 
 The inference workloads in this sample project are deployed on the CPU, GPU, or Inferentia nodes as shown on Fig. 1. The control scripts run in any location that has access to the cluster API. To eliminate latency concern related to the cluster ingress, load tests run in a pod within the cluster and send requests to the models directly through the cluster pod network.
 
-<center>
-<a href="https://www.youtube.com/watch?v=g9XRhGhQhAE"><img src="./aws-do-inference-video.png" width="90%"></a> </br>
-
+<div align="center">
+<a href="https://www.youtube.com/watch?v=g9XRhGhQhAE"><img src="./aws-do-inference-video.png" width="90%"></a>
+</br>
 Fig. 2 - aws-do-inference video walkthrough
-</center>
+</div>
+<br/>
 
 See an end-to-end accelerated [video walkthrough](https://bit.ly/aws-do-inference-video) (7 min) or follow the instructions below to build and run your own inference solution.
 
