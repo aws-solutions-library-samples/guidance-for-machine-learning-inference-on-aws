@@ -37,7 +37,7 @@ spec:
         role: master
     spec:
       nodeSelector:
-        beta.kubernetes.io/instance-type: "${instance_type}"
+        node.kubernetes.io/instance-type: "${instance_type}"
       containers:
         - name: main
           image: "${registry}${model_image_name}${model_image_tag}"
