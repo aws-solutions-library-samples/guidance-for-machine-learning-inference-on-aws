@@ -20,10 +20,13 @@ echo "Processor: $processor"
 if [ "$runtime" == "docker" ]; then
     server=0
     while [ $server -lt $num_servers ]; do
-    	run_opts="--name ${app_name}-${server} -e NUM_MODELS=$num_models -e POSTPROCESS=$postprocess -e QUIET=$quiet -P"
+	    run_opts="--name ${app_name}-${server} -e NUM_MODELS=$num_models -e POSTPROCESS=$postprocess -e QUIET=$quiet -P -v $(pwd)/../3-pack:/app/dev"    
     	if [ "$processor" == "gpu" ]; then
             run_opts="--gpus 0 ${run_opts}"
     	fi
+	if [ "$processor" == "inf" ]; then
+	    run_opts="--device=/dev/neuron${server} ${run_opts}"
+	fi
     	CMD="docker run -d ${run_opts} ${registry}${model_image_name}${model_image_tag}"
     	echo "$CMD"
     	eval "$CMD"

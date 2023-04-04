@@ -18,7 +18,7 @@ echo "Runtime: $runtime"
 echo "Processor: $processor"
 
 if [ "$runtime" == "docker" ]; then
-    CMD="docker exec -it ${app_name} bash"
+    CMD="docker exec -it ${app_name}-0 bash"
     echo "$CMD"
     eval "$CMD"
 elif [ "$runtime" == "kubernetes" ]; then

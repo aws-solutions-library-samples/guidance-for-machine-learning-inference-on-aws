@@ -5,4 +5,8 @@
 # SPDX-License-Identifier: MIT-0                                     #
 ######################################################################
 
-hypercorn fastapi-server:app -b 0.0.0.0:8080
+# Uncomment the infinate loop below to start an idle container locally while developing or troubleshooting
+#while true; do date; sleep 10; done
+
+uvicorn fastapi-server:app --host 0.0.0.0 --port 8080
+
