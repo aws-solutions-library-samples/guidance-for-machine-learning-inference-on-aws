@@ -55,16 +55,24 @@ except ValueError:
     logger.warning(f"Failed to parse environment variable NUM_MODELS={os.getenv('NUM_MODELS')}")
     logger.warning("Please ensure if set NUM_MODELS is a numeric value. Assuming value of 1")
 
-# Detect runtime device type inf,gpu, or cpu
+# Detect runtime device type inf1, inf2, gpu, or cpu
 device_type=""
+
 try:
     import torch_neuron
-    device_type="inf"
+    device_type="inf1"
 except ImportError:
-    logger.warning("Inferentia chip not detected")
+    logger.warning("Inf1 chip not detected")
+    pass
+try:
+    import torch_neuronx
+    device_type = 'inf2'
+except ImportError:
+    print('[WARN] Inf2 device not found')
     pass
 
-if device_type == "inf":
+
+if device_type in ['inf1', 'inf2']:
     pass
 elif torch.cuda.is_available():
     device_type="gpu"

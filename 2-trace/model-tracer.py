@@ -11,13 +11,18 @@ device_type='cpu'
 
 try:
     import torch_neuron
-    device_type='inf'
-except ImportError: 
-    print('[WARN] Torch Neuron not Found') 
+    device_type='inf1'
+except ImportError:
+    print('[WARN] Torch Neuron not Found')
+    pass
+try:
+    import torch_neuronx
+    device_type='inf2'
+except ImportError:
+    print('[WARN] Torch Neuronx not Found')
     pass
 
 import os
-
 
 # 1. READ config.properties
 print("\nParsing configuration ...")
@@ -61,7 +66,7 @@ inputs = tokenizer.encode_plus(question,
                                max_length=sequence_length,
                                padding='max_length',
                                truncation=True)
-if device_type != 'inf':
+if device_type not in ['inf1', 'inf2']:
     if torch.cuda.is_available():
         device = torch.device("cuda")
         device_type = "gpu"
@@ -90,6 +95,9 @@ if 'inf' in processor:
                                   verbose=1, 
                                   compiler_workdir=f'./traced-{model_name}/compile_wd_{processor}_bs{batch_size}_seq{sequence_length}_pc{pipeline_cores}',  
                                   compiler_args = ['--neuroncore-pipeline-cores', str(pipeline_cores)])
+elif 'inf2' in processor:
+    model_traced = torch_neuronx.trace(model,
+                                  example_inputs)
 else:
     model_traced = torch.jit.trace(model, example_inputs)
     

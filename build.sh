@@ -37,12 +37,16 @@ if [ "$action" == "" ]; then
 			echo "   ... base-gpu ..."
 			docker build -t ${registry}${base_image_name}${base_image_tag} -f ./1-build/Dockerfile-base-gpu .
 			;;
-		"inf")
-			echo "   ... base-inf ..."
-			docker build -t ${registry}${base_image_name}${base_image_tag} -f ./1-build/Dockerfile-base-inf .
+		"inf1")
+			echo "   ... base-inf1 ..."
+			docker build -t ${registry}${base_image_name}${base_image_tag} -f ./1-build/Dockerfile-base-inf1 .
+			;;
+                "inf2")
+                        echo "   ... base-inf2 ..."
+                        docker build -t ${registry}${base_image_name}${base_image_tag} -f ./1-build/Dockerfile-base-inf2 .
 			;;
 		*)
-			echo "Please ensure cpu, gpu, or inf is configure as processor in config.properties"
+			echo "Please ensure cpu, gpu, inf1 or inf2 is configure as processor in config.properties"
 			exit 1
 			;;
 	esac
