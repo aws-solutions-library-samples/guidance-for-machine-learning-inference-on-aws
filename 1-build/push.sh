@@ -15,4 +15,12 @@ else
     echo "config.properties not found!"
 fi
 
+./login.sh
+# Create registry if needed
+IMAGE=${base_image_name}
+REGISTRY_COUNT=$(aws ecr describe-repositories | grep ${IMAGE} | wc -l)
+if [ "$REGISTRY_COUNT" == "0" ]; then
+    aws ecr create-repository --repository-name ${IMAGE} --region ${region}
+fi
+
 docker push ${registry}${base_image_name}${base_image_tag}
