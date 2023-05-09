@@ -58,7 +58,7 @@ if [ "$runtime" == "docker" ]; then
 elif [ "$runtime" == "kubernetes" ]; then
     pushd ./5-test > /dev/null
     if [ "$1" == "bma" ]; then
-        CMD="kubectl -n ${test_namespace} get pods | grep ${test_image_name}- | cut -d ' ' -f 1 | xargs -L 1 kubectl logs | grep { | grep -v 0.0, | tee ./bmk-all.log"
+        CMD="kubectl -n ${test_namespace} get pods | grep ${test_image_name}- | cut -d ' ' -f 1 | xargs -L 1 kubectl -n ${test_namespace} logs | grep { | grep -v 0.0, | tee ./bmk-all.log"
         command -v bc > /dev/null
         if [ "$?" == "1" ]; then
             echo "bc not found"
