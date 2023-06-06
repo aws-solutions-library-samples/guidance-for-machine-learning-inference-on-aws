@@ -145,6 +145,6 @@ for i in range(num_models):
     if device_type=='gpu':
         model=models[model_id]
         model.to(device)
-    elif device_type=='inf':
+    elif device_type in ['inf1', 'inf2']:
         infer(model_id, default_question, default_context)
         logger.warning("    ... warmup completed")
