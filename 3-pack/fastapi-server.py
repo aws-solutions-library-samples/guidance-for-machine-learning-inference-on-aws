@@ -8,6 +8,7 @@ from fastapi import FastAPI,logger,responses
 from configparser import ConfigParser
 import torch, os, logging
 import importlib
+import platform
 
 global device
 global processor
@@ -55,7 +56,7 @@ except ValueError:
     logger.warning(f"Failed to parse environment variable NUM_MODELS={os.getenv('NUM_MODELS')}")
     logger.warning("Please ensure if set NUM_MODELS is a numeric value. Assuming value of 1")
 
-# Detect runtime device type inf1, inf2, gpu, or cpu
+# Detect runtime device type inf1, inf2, gpu, cpu, or arm
 device_type=""
 
 try:
@@ -79,8 +80,11 @@ elif torch.cuda.is_available():
     device = torch.device("cuda")
     logger.warning(torch.cuda.get_device_name(0))
 else:
+    machine=platform.uname().machine
     device_type="cpu"
-    device = torch.device(device_type)
+    if machine == 'arm64':
+        device_type="arm"
+    device = torch.device("cpu")
 
 if processor != device_type:
     logger.warning(f"Configured target processor {processor} differs from actual processor {device_type}")

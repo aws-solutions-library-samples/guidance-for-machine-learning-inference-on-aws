@@ -4,15 +4,19 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved. #
 # SPDX-License-Identifier: MIT-0                                     #
 ######################################################################
-
-if [ -f ../config.properties ]; then
-    source ../config.properties
-elif [ -f ../../config.properties ]; then
-    source ../../config.properties
-elif [ -f ./config.properties ]; then
-    source ./config.properties
+if [ "$num_servers" == "" ]; then
+    echo "Configuring number of model servers from config.properties ..."
+    if [ -f ../config.properties ]; then
+        source ../config.properties
+    elif [ -f ../../config.properties ]; then
+        source ../../config.properties
+    elif [ -f ./config.properties ]; then
+        source ./config.properties
+    else
+        echo "config.properties not found!"
+    fi
 else
-    echo "config.properties not found!"
+    echo "Configured number of model servers ($num_servers) from environment"
 fi
 
 server=0
