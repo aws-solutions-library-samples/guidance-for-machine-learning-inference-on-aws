@@ -134,7 +134,7 @@ async def infer(model_id, seq_0: Optional[str] = default_question, seq_1: Option
     return responses.JSONResponse(status_code=status, content={"detail": answer_text})
 
 # Load models in memory and onto accelerator as needed
-model_suffix = "bs"+batch_size+"_seq"+sequence_length+"_pc"+pipeline_cores+"_"+processor
+model_suffix = "_bs"+batch_size+"_seq"+sequence_length+"_pc"+pipeline_cores+"_"+processor
 model_path=os.path.join(path_prefix,'models',model_name + model_suffix + ".pt")
 logger.warning(f"Loading {num_models} instances of pre-trained model {model_name} from path {model_path} ...")
 tokenizers={}
