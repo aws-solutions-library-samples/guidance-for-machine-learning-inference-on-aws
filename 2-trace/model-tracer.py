@@ -10,7 +10,7 @@ from configparser import ConfigParser
 
 machine=platform.uname().machine
 device_type='cpu'
-if machine == 'arm64':
+if machine == 'aarch64':
     device_type='arm'
 
 try:
@@ -121,7 +121,7 @@ if test.lower() == 'true':
 
 # 4. SAVE THE COMPILED MODEL
 print('\nSaving traced model ...')
-model_path=f'./traced-{model_name}/{model_name}_{processor}_bs{batch_size}_seq{sequence_length}_pc{pipeline_cores}_{device_type}.pt'
+model_path=f'./traced-{model_name}/{model_name}_bs{batch_size}_seq{sequence_length}_pc{pipeline_cores}_{processor}.pt'
 model_traced.save(model_path)
 
 print(f'Done. Model saved as: {model_path}')

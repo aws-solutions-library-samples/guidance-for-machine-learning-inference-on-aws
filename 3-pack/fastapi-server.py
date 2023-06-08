@@ -82,7 +82,7 @@ elif torch.cuda.is_available():
 else:
     machine=platform.uname().machine
     device_type="cpu"
-    if machine == 'arm64':
+    if machine == 'aarch64':
         device_type="arm"
     device = torch.device("cpu")
 
@@ -134,8 +134,8 @@ async def infer(model_id, seq_0: Optional[str] = default_question, seq_1: Option
     return responses.JSONResponse(status_code=status, content={"detail": answer_text})
 
 # Load models in memory and onto accelerator as needed
-model_suffix = "bs"+batch_size+"_seq"+sequence_length+"_pc"+pipeline_cores
-model_path=os.path.join(path_prefix,'models',model_name + "_" + processor + "_" + model_suffix + ".pt")
+model_suffix = "bs"+batch_size+"_seq"+sequence_length+"_pc"+pipeline_cores+"_"+processor
+model_path=os.path.join(path_prefix,'models',model_name + model_suffix + ".pt")
 logger.warning(f"Loading {num_models} instances of pre-trained model {model_name} from path {model_path} ...")
 tokenizers={}
 models={}
