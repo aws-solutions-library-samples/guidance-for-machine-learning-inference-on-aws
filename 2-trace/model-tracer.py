@@ -3,11 +3,15 @@
 # SPDX-License-Identifier: MIT-0                                     #
 ######################################################################
 
+import platform
 import torch
 import importlib
 from configparser import ConfigParser
 
+machine=platform.uname().machine
 device_type='cpu'
+if machine == 'aarch64':
+    device_type='arm'
 
 try:
     import torch_neuron
@@ -74,7 +78,6 @@ if device_type not in ['inf1', 'inf2']:
         inputs.to(device)
     else:
         device = torch.device("cpu")
-        device_type = 'cpu'
 
 if device_type == processor:
     print(f"   ... Using device: {device_type}")
@@ -118,7 +121,7 @@ if test.lower() == 'true':
 
 # 4. SAVE THE COMPILED MODEL
 print('\nSaving traced model ...')
-model_path=f'./traced-{model_name}/{model_name}_{processor}_bs{batch_size}_seq{sequence_length}_pc{pipeline_cores}.pt'
+model_path=f'./traced-{model_name}/{model_name}_bs{batch_size}_seq{sequence_length}_pc{pipeline_cores}_{processor}.pt'
 model_traced.save(model_path)
 
 print(f'Done. Model saved as: {model_path}')

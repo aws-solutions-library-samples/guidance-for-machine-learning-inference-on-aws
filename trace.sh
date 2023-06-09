@@ -20,26 +20,17 @@ if [ "$1" == "" ]; then
 	source ./config.properties
 	echo ""
 	echo "Tracing model $huggingface_model_name ..."
-
+	
+	dockerfile=./1-build/Dockerfile-base-${processor}
 	echo ""
-	case "$processor" in
-		"cpu")
-			echo "   ... for cpu ..."
-			docker run -it --rm -v $(pwd)/2-trace:/app/trace -v $(pwd)/config.properties:/app/config.properties ${registry}${base_image_name}${base_image_tag} bash -c "cd /app/trace; python model-tracer.py"
-			;;
-		"gpu")
-			echo "   ... for gpu ..."
-			docker run --gpus 0 -it --rm -v $(pwd)/2-trace:/app/trace -v $(pwd)/config.properties:/app/config.properties ${registry}${base_image_name}${base_image_tag} bash -c "cd /app/trace; python model-tracer.py"
-			;;
-		"inf")
-			echo "   ... for inf ..."
-			docker run -it --rm -e AWS_NEURON_VISIBLE_DEVICES=ALL --privileged -v $(pwd)/2-trace:/app/trace -v $(pwd)/config.properties:/app/config.properties ${registry}${base_image_name}${base_image_tag} bash -c "cd /app/trace; python model-tracer.py"
-			;;
-		*)
-			echo "Please ensure cpu, gpu, or inf is configure as processor in config.properties"
-			exit 1
-			;;
-	esac
+	if [ -f $dockerfile ]; then
+		echo "   ... for processor $processor ..."
+		trace_opts=trace_opts_${processor}
+		docker run ${!trace_opts} -it --rm -v $(pwd)/2-trace:/app/trace -v $(pwd)/config.properties:/app/config.properties ${registry}${base_image_name}${base_image_tag} bash -c "cd /app/trace; python model-tracer.py"
+	else
+		echo "Processor $processor is not supported. Please ensure the processor setting in config.properties is configured properly"
+		exit 1
+	fi
 else
 	print_help
 fi
