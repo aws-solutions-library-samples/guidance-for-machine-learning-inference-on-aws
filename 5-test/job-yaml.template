@@ -37,5 +37,5 @@ spec:
         - name: request_frequency
           value: "$request_frequency"
         resources:
-          limits:
+          requests:
             cpu: 1
