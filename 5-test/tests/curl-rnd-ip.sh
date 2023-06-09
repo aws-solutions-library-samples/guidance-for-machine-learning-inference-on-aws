@@ -26,6 +26,7 @@ models=$num_models
 
 # get instance ip addresses
 rm -f  ./endpoint_ip.conf
+echo "runtime=$runtime"
 while [ $server -lt $servers ]
 do
 	if [ "$runtime" == "docker" ]; then
