@@ -35,8 +35,10 @@ while IFS='' read -r line; do
     p95_sum=$( echo "$p95_sum + $p95" | bc)
     errors_total=$(echo "${errors_total} + $errors" | bc)
 done < $1
+echo 'Line count is:'$line_count
+echo 'Throughputsum is:' $throughput_sum
 
-throughput_total=$(echo "scale=1; $throughput_clients * $throughput_sum / $line_count" | bc)
+throughput_total=$(echo "scale=1; $throughput_clients * ($throughput_sum / $line_count)" | bc)
 p50_avg=$(echo "scale=3; $p50_sum / $line_count" | bc)
 p90_avg=$(echo "scale=3; $p90_sum / $line_count" | bc)
 p95_avg=$(echo "scale=3; $p95_sum / $line_count" | bc)
