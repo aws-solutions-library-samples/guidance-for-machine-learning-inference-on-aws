@@ -36,8 +36,6 @@ spec:
         node.kubernetes.io/instance-type: "${instance_type}"
       containers:
       - name: main
-        # if using pre-built public registry image (may require authentication):
-        # image: public.ecr.aws/a2u7h5w3/bert-base-workshop:v9-cpu
         image: "${registry}${model_image_name}${model_image_tag}"
         imagePullPolicy: Always
         env:
@@ -51,10 +49,10 @@ spec:
         - name: pod-port
           containerPort: 8080
         resources:
-        # Use 'memory' in limits and requests too ensure that model pods get scheduled to nodes evenly
+        # Use 'memory' setting in limits and requests to ensure that model pods get scheduled to nodes evenly
           limits:
             cpu: 1
             #memory: "27000Mi"
          #requests:
-         #  memory: "27000Mi"
+            #memory: "27000Mi"
 

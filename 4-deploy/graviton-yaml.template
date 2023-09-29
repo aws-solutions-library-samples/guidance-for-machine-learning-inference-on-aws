@@ -44,8 +44,6 @@ spec:
               app: ${instance_name}
       containers:
       - name: main
-        # if using pre-built public registry image (may require authentication):
-        # image:  public.ecr.aws/a2u7h5w3/bert-base-workshop:v10-graviton
         image: "${registry}${model_image_name}${model_image_tag}"
         imagePullPolicy: Always
         env:
