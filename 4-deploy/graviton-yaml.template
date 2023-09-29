@@ -58,8 +58,9 @@ spec:
           containerPort: 8080
         resources:
           limits:
-            cpu: "8"
+            #set value based on total available node memory and intended num pods/node
+            memory: "30000Mi"
           requests:
-            cpu: "7"
-            memory: "11000Mi"
+            #set value based on total available node memory and intended num pods/node
+            memory: "27000Mi"
 
