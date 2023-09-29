@@ -57,6 +57,7 @@ spec:
               add:
                 - IPC_LOCK
           resources:
+          #use limits and requests to ensure that certain number of model pods get scheduled per node
             limits:
               #hugepages-2Mi: 256Mi    # configure to 256 * desired number of Inferentia devices.
               aws.amazon.com/neuron: 1  # desired number of Inferentia devices.
