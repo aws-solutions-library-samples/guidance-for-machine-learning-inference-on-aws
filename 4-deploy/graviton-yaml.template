@@ -44,6 +44,8 @@ spec:
               app: ${instance_name}
       containers:
       - name: main
+        # if using pre-built public registry image (may require authentication):
+        # image:  public.ecr.aws/a2u7h5w3/bert-base-workshop:v10-graviton
         image: "${registry}${model_image_name}${model_image_tag}"
         imagePullPolicy: Always
         env:
@@ -57,9 +59,10 @@ spec:
         - name: pod-port
           containerPort: 8080
         resources:
+        #use limits and requests to ensure that certain number of model pods get scheduled per node
           limits:
             #set value based on total available node memory and intended num pods/node
-            memory: "30000Mi"
+            memory: "27000Mi"
           requests:
             #set value based on total available node memory and intended num pods/node
             memory: "27000Mi"

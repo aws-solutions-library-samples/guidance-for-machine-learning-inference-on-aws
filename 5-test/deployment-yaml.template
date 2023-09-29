@@ -20,6 +20,8 @@ spec:
         node.kubernetes.io/instance-type: "${test_instance_type}"
       containers:
       - name: main
+        # if using pre-built images in public repository, use the following image:
+        # public.ecr.aws/a2u7h5w3/bert-base-workshop:test-v10-cpu
         image: "${registry}${test_image_name}${test_image_tag}"
         command: ["bash","-c","${cmd_pod}"]
         imagePullPolicy: Always

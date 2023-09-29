@@ -40,6 +40,8 @@ spec:
         node.kubernetes.io/instance-type: "${instance_type}"
       containers:
         - name: main
+          # if using pre-built public registry image (may require authentication):
+          # image: public.ecr.aws/a2u7h5w3/bert-base-workshop:v10-inf2
           image: "${registry}${model_image_name}${model_image_tag}"
           env:
             - name: NUM_MODELS
@@ -57,6 +59,7 @@ spec:
               add:
                 - IPC_LOCK
           resources:
+          #use limits and requests to ensure that certain number of model pods get scheduled per node
             limits:
               #hugepages-2Mi: 256Mi    # configure to 256 * desired number of Inferentia devices.
               aws.amazon.com/neuron: 1  # desired number of Inferentia devices.
