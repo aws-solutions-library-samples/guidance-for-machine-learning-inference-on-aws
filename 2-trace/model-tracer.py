@@ -92,13 +92,13 @@ example_inputs = (
 )
 os.makedirs(f'traced-{model_name}', exist_ok=True)
 torch.set_num_threads(6)
-if 'inf' in processor:
+if 'inf' == processor:
     model_traced = torch.neuron.trace(model, 
                                   example_inputs, 
                                   verbose=1, 
                                   compiler_workdir=f'./traced-{model_name}/compile_wd_{processor}_bs{batch_size}_seq{sequence_length}_pc{pipeline_cores}',  
                                   compiler_args = ['--neuroncore-pipeline-cores', str(pipeline_cores)])
-elif 'inf2' in processor:
+elif 'inf2' == processor:
     model_traced = torch_neuronx.trace(model,
                                   example_inputs)
 else:
