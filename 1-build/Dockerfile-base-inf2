@@ -1,21 +1,41 @@
 FROM amazonlinux:2
-  
-LABEL description="Base container for Inferentia1 models"
+
+LABEL description="Base container for Inferentia2 models"
 ENV PYTHONUNBUFFERED=TRUE
 ENV PYTHONDONTWRITEBYTECODE=TRUE
 ADD ./1-build/etc /etc
+# Neuron SDK components version numbers
+ARG NEURONX_RUNTIME_LIB_VERSION=2.16.*
+ARG NEURONX_COLLECTIVES_LIB_VERSION=2.16.*
+ARG NEURONX_TOOLS_VERSION=2.13.*
+ARG NEURONX_FRAMEWORK_VERSION=1.13.1.1.10.*
+ARG NEURONX_TRANSFORMERS_VERSION=0.6.*
+ARG NEURONX_CC_VERSION=2.9.*
+ARG TORCHSERVE_VERSION=0.8.2
+
 RUN echo -e '[neuron]\nname=Neuron YUM Repository\nbaseurl=https://yum.repos.neuron.amazonaws.com\nenabled=1\nmetadata_expire=0\n' >> /etc/yum.repos.d/neuron.repo
 RUN rpm --import https://yum.repos.neuron.amazonaws.com/GPG-PUB-KEY-AMAZON-AWS-NEURON.PUB
+RUN amazon-linux-extras install -y python3.8
 RUN yum update -y && \
-    yum install -y python3 python3-devel gcc-c++ && \
-    yum install -y tar gzip ca-certificates procps net-tools which vim wget libgomp htop jq bind-utils bc pciutils && \
-    yum install -y aws-neuronx-tools-2.*
-RUN yum install -y aws-neuronx-collectives-2.* && \
-    yum install -y aws-neuronx-runtime-lib-2.*
-RUN pip3 install --upgrade --force-reinstall --no-cache-dir neuronx-cc[tensorflow] torch-neuronx transformers==4.2.0 --extra-index-url=https://pip.repos.neuron.amazonaws.com
-RUN pip3 install --no-cache-dir torchserve==0.3.0 torch-model-archiver==0.3.0 configparser
-RUN alternatives --install /usr/bin/python python /usr/bin/python3 1; alternatives --install /usr/bin/pip pip /usr/bin/pip3 1
-RUN echo "export PATH=/opt/aws/neuron/bin:$PATH" >> /root/.bashrc
+    yum install -y git tar gzip ca-certificates procps net-tools which vim wget libgomp htop jq bind-utils bc pciutils && \
+    yum install -y gcc-c++ && \
+    yum install -y jq java-11-amazon-corretto-headless  # for torchserve
+RUN yum install -y aws-neuronx-collectives-${NEURONX_COLLECTIVES_LIB_VERSION} && \
+    yum install -y aws-neuronx-runtime-lib-${NEURONX_RUNTIME_LIB_VERSION} && \
+    yum install -y aws-neuronx-tools-${NEURONX_TOOLS_VERSION}
+ENV PATH="/opt/aws/neuron/bin:${PATH}"
+RUN echo 'alias python=python3.8' >> ~/.bashrc
+RUN echo 'alias pip=pip3.8' >> ~/.bashrc
+
+RUN pip3.8 install --extra-index-url https://pip.repos.neuron.amazonaws.com \
+    neuronx-cc==$NEURONX_CC_VERSION \
+    torch-neuronx==$NEURONX_FRAMEWORK_VERSION \
+    transformers-neuronx==$NEURONX_TRANSFORMERS_VERSION 
+RUN pip3.8 install "protobuf<4" \
+    && pip3.8 install torchserve==${TORCHSERVE_VERSION} \
+    && pip3.8 install torch-model-archiver==${TORCHSERVE_VERSION} \
+    && pip3.8 install --no-deps --no-cache-dir -U torchvision==0.14.* captum==0.6.0 configparser
+
 RUN echo "alias ll='ls -alh --color=auto'" >> /root/.bashrc 
 ADD ./1-build/*.py /app/
 
