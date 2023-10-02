@@ -26,6 +26,7 @@ RUN yum install -y aws-neuronx-collectives-${NEURONX_COLLECTIVES_LIB_VERSION} &&
 ENV PATH="/opt/aws/neuron/bin:${PATH}"
 RUN echo 'alias python=python3.8' >> ~/.bashrc
 RUN echo 'alias pip=pip3.8' >> ~/.bashrc
+RUN update-alternatives --install /usr/bin/pip pip /usr/bin/pip3.8 1
 
 RUN pip3.8 install --extra-index-url https://pip.repos.neuron.amazonaws.com \
     neuronx-cc==$NEURONX_CC_VERSION \
