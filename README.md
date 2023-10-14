@@ -6,9 +6,10 @@ enables hybrid deployments where the best processor/accelerator is used to serve
 In this sample repository, we use a [bert-base](https://huggingface.co/distilbert-base-multilingual-cased) NLP model from [huggingface.co](https://huggingface.co/), however the project structure and workflow is generic and can be adapted for use with other models.
 
 <div align="center">
-<img src="./aws-do-inference.png" width="90%">
+<!--img src="./aws-do-inference.png" width="90%"-->
+<img src="./low-latency-high-throughput-inference-on-amazon-eks.png" width="90%">  
 <br/>
-Fig. 1 - Sample EKS infrastructure for inference workloads
+Fig. 1 - Sample Amazon EKS cluster infrastructure for deploying, running and testing ML Inference workloads
 </div>
 <br/>
 
