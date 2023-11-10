@@ -8,8 +8,6 @@ from fastapi import FastAPI,logger,responses
 from configparser import ConfigParser
 import torch, os, logging
 import importlib
-import platform
-from transformers import AutoTokenizer
 
 global device
 global processor
@@ -19,7 +17,6 @@ global tokenizer
 global logger
 global postprocess
 global default_question, default_context
-
 
 logger = logging.getLogger()
 
@@ -32,18 +29,22 @@ with open(path_prefix + '/../config.properties') as f:
 config = ConfigParser()
 config.read_string(config_lines)
 model_name = config['global']['huggingface_model_name']
-tokenizer_class_name = config['global']['huggingface_tokenizer_class'] 
+tokenizer_class_name = config['global']['huggingface_tokenizer_class']
 model_class_name = config['global']['huggingface_model_class']
-neuron_model_class_name = config['global']['neuron_model_class']
 sequence_length=config['global']['sequence_length']
 processor=config['global']['processor']
 pipeline_cores=config['global']['pipeline_cores']
 batch_size=config['global']['batch_size']
-default_prompts = ["My name is Mike and"]*batch_size
-tp_degree=config['global']['tp_degree']
-amp_type=config['global']['amp_type']
+default_question = "What does the little engine say"
+default_context = """In the childrens story about the little engine a small locomotive is pulling a large load up a mountain.
+    Since the load is heavy and the engine is small it is not sure whether it will be able to do the job. This is a story 
+    about how an optimistic attitude empowers everyone to achieve more. In the story the little engine says: 'I think I can' as it is 
+    pulling the heavy load all the way to the top of the mountain. On the way down it says: I thought I could."""
 
 # Read runtime configuration from environment
+postprocess=True
+if (os.getenv("POSTPROCESS",'True').lower() in ['false','0']):
+    postprocess=False
 quiet=False
 if (os.getenv("QUIET","False").lower() in ['true','1']):
     quiet=True
@@ -54,7 +55,7 @@ except ValueError:
     logger.warning(f"Failed to parse environment variable NUM_MODELS={os.getenv('NUM_MODELS')}")
     logger.warning("Please ensure if set NUM_MODELS is a numeric value. Assuming value of 1")
 
-# Detect runtime device type inf2, gpu, cpu, or arm
+# Detect runtime device type inf1, inf2, gpu, or cpu
 device_type=""
 
 try:
@@ -78,11 +79,8 @@ elif torch.cuda.is_available():
     device = torch.device("cuda")
     logger.warning(torch.cuda.get_device_name(0))
 else:
-    machine=platform.uname().machine
     device_type="cpu"
-    if machine == 'aarch64':
-        device_type="arm"
-    device = torch.device("cpu")
+    device = torch.device(device_type)
 
 if processor != device_type:
     logger.warning(f"Configured target processor {processor} differs from actual processor {device_type}")
@@ -99,68 +97,54 @@ async def read_root():
 
 # Model inference API endpoint
 @app.get("/predictions/{model_id}")
-async def infer(model_id, seqs: Optional[list] = default_prompts):
-    prompts=seqs
+async def infer(model_id, seq_0: Optional[str] = default_question, seq_1: Optional[str] = default_context):
+    question=seq_0
+    context=seq_1
     status=200
     if model_id in models.keys():
         if not quiet:
-            logger.warning(f"\nQuestion: {prompts}\n")
-
-        tokenizer_dir = "/home/ubuntu/workspace/llama2/7B" # directory where tokenizer_model.bin is
-        tokenizer = AutoTokenizer.from_pretrained(tokenizer_dir)
-
-        tokens = tokenizer(prompts, return_tensors="pt")
-        neuron_model=models[model_id]
-        generated_sequences = neuron_model.sample(tokens.input_ids, sequence_length=sequence_length, top_k=50)
-        generated_sequences = [tokenizer.decode(seq) for seq in generated_sequences]
-
+            logger.warning(f"\nQuestion: {question}\n")
+        tokenizer=tokenizers[model_id]
+        encoded_input = tokenizer.encode_plus(question, context, return_tensors='pt', max_length=128, padding='max_length', truncation=True)
+        if processor=='gpu':
+            encoded_input.to(device)
+        model=models[model_id]
+        model_input = (encoded_input['input_ids'],  encoded_input['attention_mask'])
+        output=model(*model_input) # This is specific to Inferentia
+        answer_text = str(output[0])
+        if postprocess:
+            answer_start = torch.argmax(output[0])
+            answer_end = torch.argmax(output[1])+1
+            if (answer_end > answer_start):
+                answer_text = tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(encoded_input["input_ids"][0][answer_start:answer_end]))
+            else:
+                answer_text = tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(encoded_input["input_ids"][0][answer_start:]))
         if not quiet:
             logger.warning("\nAnswer: ")
-            logger.warning(generated_sequences)
+            logger.warning(answer_text)
     else:
         status=404
-        generated_sequences = f"Model {model_id} does not exist. Try a model name up to model{num_models-1}"
+        answer_text = f"Model {model_id} does not exist. Try a model name up to model{num_models-1}"
         if not quiet:
-            logger.warning(generated_sequences)
-    return responses.JSONResponse(status_code=status, content={"detail": generated_sequences})
+            logger.warning(answer_text)
+    return responses.JSONResponse(status_code=status, content={"detail": answer_text})
 
 # Load models in memory and onto accelerator as needed
-#model_suffix = "_bs"+batch_size+"_seq"+sequence_length+"_pc"+pipeline_cores+"_"+processor
-#model_path=os.path.join(path_prefix,'models',model_name + model_suffix + ".pt")
-#logger.warning(f"Loading {num_models} instances of pre-trained model {model_name} from path {model_path} ...")
-
-# set neuron environment variable
-os.environ["NEURON_CC_FLAGS"] = "--model-type=transformer-inference --enable-experimental-O1"
-os.environ['NEURON_RT_NUM_CORES'] = str(tp_degree)
-os.environ["NEURONX_CACHE"]= "on"
-os.environ["NEURONX_DUMP_TO"] = f"./neuron_cache/tp{tp_degree}_bs{batch_size}_seqlen{sequence_length}"
-
-model_dir = "/tmp/llama2/7B" # [TODO], hard-coded, to add to config.properties
-tokenizer_dir = "/tmp/llama2/7B" # tokenizer in the same directory as model
-
-serialized_model_dir = os.path.join(model_dir, 'serialized')
-os.makedirs(serialized_model_dir, exist_ok=True)
-
+model_suffix = "bs"+batch_size+"_seq"+sequence_length+"_pc"+pipeline_cores
+model_path=os.path.join(path_prefix,'models',model_name + "_" + processor + "_" + model_suffix + ".pt")
+logger.warning(f"Loading {num_models} instances of pre-trained model {model_name} from path {model_path} ...")
 tokenizers={}
 models={}
 transformers = importlib.import_module("transformers")
 tokenizer_class = getattr(transformers, tokenizer_class_name)
-transformers_neuronx = importlib.import_module("transformers_neuronx")
-neuron_model_class = getattr(transformers_neuronx, neuron_model_class_name)
-
 for i in range(num_models):
     model_id = 'model' + str(i)
     logger.warning(f"   {model_id} ...")
     tokenizers[model_id]=tokenizer_class.from_pretrained(model_name)
-    tokenizer = AutoTokenizer.from_pretrained(tokenizer_dir)
-    if device_type in ['inf2']:
-        models[model_id] = neuron_model_class.from_pretrained(serialized_model_dir, tp_degree=tp_degree, batch_size=batch_size, amp=amp_type)
-        neuron_model = models[model_id]
-        neuron_model.to_neuron() # compile model and load weights into device memory
-        infer(model_id, default_prompts)
+    models[model_id] = torch.jit.load(model_path)
+    if device_type=='gpu':
+        model=models[model_id]
+        model.to(device)
+    elif device_type in ['inf1', 'inf2']:
+        infer(model_id, default_question, default_context)
         logger.warning("    ... warmup completed")
-    else:
-        logger.warning("    ... inference other than inf2 needs to be added")
-
-
-

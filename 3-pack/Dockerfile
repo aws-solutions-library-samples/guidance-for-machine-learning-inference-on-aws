@@ -18,7 +18,7 @@ COPY ./3-pack/run.sh /app/server/run.sh
 
 COPY ./3-pack/requirements.txt /app/server/requirements.txt
 
-COPY ./2-trace/traced-${MODEL_NAME}/${MODEL_FILE_NAME} /app/server/models
+COPY ./llama_model/serialized /app/server/models
 
 RUN pip install -r /app/server/requirements.txt
 

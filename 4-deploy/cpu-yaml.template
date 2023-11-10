@@ -49,10 +49,6 @@ spec:
         - name: pod-port
           containerPort: 8080
         resources:
-        # Use 'memory' setting in limits and requests to ensure that model pods get scheduled to nodes evenly
           limits:
             cpu: 1
-            #memory: "27000Mi"
-         #requests:
-            #memory: "27000Mi"
 
