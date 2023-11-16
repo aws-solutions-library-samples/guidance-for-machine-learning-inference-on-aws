@@ -10,6 +10,7 @@ import torch, os, logging
 import importlib
 import platform
 from transformers import AutoTokenizer
+from transformers_neuronx.llama.model import LlamaForSampling
 
 global device
 global processor
@@ -35,12 +36,12 @@ model_name = config['global']['huggingface_model_name']
 tokenizer_class_name = config['global']['huggingface_tokenizer_class'] 
 model_class_name = config['global']['huggingface_model_class']
 neuron_model_class_name = config['global']['neuron_model_class']
-sequence_length=config['global']['sequence_length']
+sequence_length=int(config['global']['sequence_length'])
 processor=config['global']['processor']
-pipeline_cores=config['global']['pipeline_cores']
-batch_size=config['global']['batch_size']
+pipeline_cores=int(config['global']['pipeline_cores'])
+batch_size=int(config['global']['batch_size'])
 default_prompts = ["My name is Mike and"]*batch_size
-tp_degree=config['global']['tp_degree']
+tp_degree=int(config['global']['tp_degree'])
 amp_type=config['global']['amp_type']
 
 # Read runtime configuration from environment
@@ -106,9 +107,7 @@ async def infer(model_id, seqs: Optional[list] = default_prompts):
         if not quiet:
             logger.warning(f"\nQuestion: {prompts}\n")
 
-        tokenizer_dir = "/home/ubuntu/workspace/llama2/7B" # directory where tokenizer_model.bin is
-        tokenizer = AutoTokenizer.from_pretrained(tokenizer_dir)
-
+        tokenizer = tokenizers[model_id]
         tokens = tokenizer(prompts, return_tensors="pt")
         neuron_model=models[model_id]
         generated_sequences = neuron_model.sample(tokens.input_ids, sequence_length=sequence_length, top_k=50)
@@ -130,13 +129,13 @@ async def infer(model_id, seqs: Optional[list] = default_prompts):
 #logger.warning(f"Loading {num_models} instances of pre-trained model {model_name} from path {model_path} ...")
 
 # set neuron environment variable
-os.environ["NEURON_CC_FLAGS"] = "--model-type=transformer-inference --enable-experimental-O1"
+os.environ["NEURON_CC_FLAGS"] = "--model-type=transformer-inference"
 os.environ['NEURON_RT_NUM_CORES'] = str(tp_degree)
 os.environ["NEURONX_CACHE"]= "on"
-os.environ["NEURONX_DUMP_TO"] = f"./neuron_cache/tp{tp_degree}_bs{batch_size}_seqlen{sequence_length}"
+os.environ["NEURONX_DUMP_TO"] = f"/app/server/models/tp{tp_degree}_bs{batch_size}_seqlen{sequence_length}"
 
-model_dir = "/tmp/llama2/7B" # [TODO], hard-coded, to add to config.properties
-tokenizer_dir = "/tmp/llama2/7B" # tokenizer in the same directory as model
+model_dir = "/app/server/models" # [TODO], hard-coded, to add to config.properties
+tokenizer_dir = "/app/server/models" # tokenizer in the same directory as model
 
 serialized_model_dir = os.path.join(model_dir, 'serialized')
 os.makedirs(serialized_model_dir, exist_ok=True)
@@ -146,15 +145,16 @@ models={}
 transformers = importlib.import_module("transformers")
 tokenizer_class = getattr(transformers, tokenizer_class_name)
 transformers_neuronx = importlib.import_module("transformers_neuronx")
-neuron_model_class = getattr(transformers_neuronx, neuron_model_class_name)
+#neuron_model_class = getattr(transformers_neuronx, neuron_model_class_name)
 
 for i in range(num_models):
     model_id = 'model' + str(i)
     logger.warning(f"   {model_id} ...")
-    tokenizers[model_id]=tokenizer_class.from_pretrained(model_name)
     tokenizer = AutoTokenizer.from_pretrained(tokenizer_dir)
+    tokenizers[model_id]=tokenizer
     if device_type in ['inf2']:
-        models[model_id] = neuron_model_class.from_pretrained(serialized_model_dir, tp_degree=tp_degree, batch_size=batch_size, amp=amp_type)
+        #models[model_id] = neuron_model_class.from_pretrained(serialized_model_dir, tp_degree=tp_degree, batch_size=batch_size, amp=amp_type)
+        models[model_id] = LlamaForSampling.from_pretrained(serialized_model_dir, tp_degree=tp_degree, batch_size=batch_size, amp=amp_type)
         neuron_model = models[model_id]
         neuron_model.to_neuron() # compile model and load weights into device memory
         infer(model_id, default_prompts)
