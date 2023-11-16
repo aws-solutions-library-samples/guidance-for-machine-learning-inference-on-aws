@@ -4,19 +4,15 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved. #
 # SPDX-License-Identifier: MIT-0                                     #
 ######################################################################
-if [ "$num_servers" == "" ]; then
-    echo "Configuring number of model servers from config.properties ..."
-    if [ -f ../config.properties ]; then
-        source ../config.properties
-    elif [ -f ../../config.properties ]; then
-        source ../../config.properties
-    elif [ -f ./config.properties ]; then
-        source ./config.properties
-    else
-        echo "config.properties not found!"
-    fi
+
+if [ -f ../config.properties ]; then
+    source ../config.properties
+elif [ -f ../../config.properties ]; then
+    source ../../config.properties
+elif [ -f ./config.properties ]; then
+    source ./config.properties
 else
-    echo "Configured number of model servers ($num_servers) from environment"
+    echo "config.properties not found!"
 fi
 
 server=0
@@ -26,7 +22,6 @@ models=$num_models
 
 # get instance ip addresses
 rm -f  ./endpoint_ip.conf
-echo "runtime=$runtime"
 while [ $server -lt $servers ]
 do
 	if [ "$runtime" == "docker" ]; then

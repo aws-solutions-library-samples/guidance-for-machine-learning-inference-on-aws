@@ -5,19 +5,14 @@
 # SPDX-License-Identifier: MIT-0                                     #
 ######################################################################
 
-if [ "$num_servers" == "" ]; then
-    echo "Configuring number of model servers from config.properties ..."
-    if [ -f ../config.properties ]; then
-        source ../config.properties
-    elif [ -f ../../config.properties ]; then
-        source ../../config.properties
-    elif [ -f ./config.properties ]; then
-        source ./config.properties
-    else
-        echo "config.properties not found!"
-    fi
+if [ -f ../config.properties ]; then
+    source ../config.properties
+elif [ -f ../../config.properties ]; then
+    source ../../config.properties
+elif [ -f ./config.properties ]; then
+    source ./config.properties
 else
-    echo "Configured number of model servers ($num_servers) from environment"
+    echo "config.properties not found!"
 fi
 
 server=0
@@ -27,15 +22,12 @@ models=$num_models
 
 # get server ip addresses
 rm -f  ./endpoint_ip.conf
-echo "runtime=$runtime"
 while [ $server -lt $servers ]
 do
 	if [ "$runtime" == "docker" ]; then
 		instance_ip=$(cat /etc/hosts | grep  ${app_name}-${server} | awk '{print $1}')
 	elif [ "$runtime" == "kubernetes" ]; then
-		#echo "host=${app_name}-${server}.${namespace}.svc.cluster.local"
 		instance_ip=$(host ${app_name}-${server}.${namespace}.svc.cluster.local | grep "has address" | cut -d ' ' -f 4)
-		#echo "instance_ip=$instance_ip"
 	fi
 	echo $instance_ip >> endpoint_ip.conf
 	server=$((server+1))

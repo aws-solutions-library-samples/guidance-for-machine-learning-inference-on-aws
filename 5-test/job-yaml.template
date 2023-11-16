@@ -14,28 +14,13 @@ spec:
         app: ${instance_name}
     spec:
       nodeSelector:
-        node.kubernetes.io/instance-type: "${test_instance_type}"
+        beta.kubernetes.io/instance-type: "${test_instance_type}"
       restartPolicy: Never
       containers:
       - name: main
         image: "${registry}${test_image_name}${test_image_tag}"
         command: ["bash","-c","${cmd_pod}"]
         imagePullPolicy: Always
-        env:
-        - name: runtime
-          value: "$runtime"
-        - name: num_servers
-          value: "$num_servers"
-        - name: num_models
-          value: "$num_models"
-        - name: app_name
-          value: "$app_name"
-        - name: namespace
-          value: "$namespace"
-        - name: num_requests
-          value: "$num_requests"
-        - name: request_frequency
-          value: "$request_frequency"
         resources:
-          requests:
+          limits:
             cpu: 1

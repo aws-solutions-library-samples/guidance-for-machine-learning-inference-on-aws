@@ -28,15 +28,29 @@ if [ "$action" == "" ]; then
 	echo "Building base container ..."
 	
 	echo ""
-	dockerfile=./1-build/Dockerfile-base-${processor}
-	if [ -f $dockerfile ]; then
-		echo "    ... base-${processor} ..."
-		docker build -t ${registry}${base_image_name}${base_image_tag} -f $dockerfile .
-	else
-		echo "Dockerfile $dockerfile was not found."
-	        echo "Please ensure that processor is configured with a supported value in config.properties"
-		exit 1
-	fi
+	case "$processor" in
+		"cpu")
+			echo "   ... base-cpu ..."
+			docker build -t ${registry}${base_image_name}${base_image_tag} -f ./1-build/Dockerfile-base-cpu .
+			;;
+		"gpu")
+			echo "   ... base-gpu ..."
+			docker build -t ${registry}${base_image_name}${base_image_tag} -f ./1-build/Dockerfile-base-gpu .
+			;;
+		"inf1")
+			echo "   ... base-inf1 ..."
+			docker build -t ${registry}${base_image_name}${base_image_tag} -f ./1-build/Dockerfile-base-inf1 .
+			;;
+                "inf2")
+                        echo "   ... base-inf2 ..."
+                        docker build -t ${registry}${base_image_name}${base_image_tag} -f ./1-build/Dockerfile-base-inf2 .
+			;;
+		*)
+			echo "Please ensure cpu, gpu, inf1 or inf2 is configure as processor in config.properties"
+			exit 1
+			;;
+	esac
+
 elif [ "$action" == "push" ]; then
 	./1-build/push.sh
 elif [ "$action" == "pull" ]; then

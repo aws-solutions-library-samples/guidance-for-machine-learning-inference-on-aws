@@ -18,9 +18,19 @@ COPY ./3-pack/run.sh /app/server/run.sh
 
 COPY ./3-pack/requirements.txt /app/server/requirements.txt
 
-COPY ./2-trace/traced-${MODEL_NAME}/${MODEL_FILE_NAME} /app/server/models
+COPY ./llama_model/serialized /app/server/models/serialized
+
+#COPY ./$HOME/llamav2_13b_converted/serialized /app/server/models/serialized
+
+COPY ./2-trace/neuron_cache/tp2_bs1_seqlen256 /app/server/models/tp2_bs1_seqlen256
+
+COPY ./llama_model/tokenizer* /app/server/models/
+
+#COPY ./$HOME/llamav2_13b_converted/tokenizer* /app/server/models/
 
 RUN pip install -r /app/server/requirements.txt
+
+RUN pip install python-multipart
 
 WORKDIR /app/server
 

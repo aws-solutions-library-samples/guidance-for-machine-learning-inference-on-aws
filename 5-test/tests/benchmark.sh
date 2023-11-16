@@ -5,21 +5,14 @@
 # SPDX-License-Identifier: MIT-0                                     #
 ######################################################################
 
-if [ "$num_servers" == "" ]; then
-
-    echo "Configuring number of model servers from config.properties ..."
-
-    if [ -f ../config.properties ]; then
-        source ../config.properties
-    elif [ -f ../../config.properties ]; then
-        source ../../config.properties
-    elif [ -f ./config.properties ]; then
-        source ./config.properties
-    else
-        echo "config.properties not found!"
-    fi
+if [ -f ../config.properties ]; then
+    source ../config.properties
+elif [ -f ../../config.properties ]; then
+    source ../../config.properties
+elif [ -f ./config.properties ]; then
+    source ./config.properties
 else
-    echo "Number of model servers ($num_servers) configured from environment ..."
+    echo "config.properties not found!"
 fi
 
 if [ "$runtime" == "docker" ]; then
