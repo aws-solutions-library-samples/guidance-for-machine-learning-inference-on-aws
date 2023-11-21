@@ -31,7 +31,7 @@ if [ "$runtime" == "docker" ]; then
     eval "$CMD"
 elif [ "$runtime" == "kubernetes" ]; then
     if [ "$1" == "" ]; then
-        kubectl -n ${test_namespace} get pods | grep ${test_image_name}- | cut -d ' ' -f 1 | xargs -L 1 kubectl logs 
+        kubectl -n ${test_namespace} get pods | grep ${test_image_name}- | cut -d ' ' -f 1 | xargs -L 1 kubectl -n ${test_namespace} logs 
     else
         kubectl -n ${test_namespace} logs -f $(kubectl -n ${test_namespace} get pods | grep ${test_image_name}-$1 | cut -d ' ' -f 1)
     fi
