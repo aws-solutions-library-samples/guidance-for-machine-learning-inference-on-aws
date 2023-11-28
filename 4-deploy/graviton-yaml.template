@@ -59,9 +59,9 @@ spec:
         resources:
         #use limits and requests to ensure that certain number of model pods get scheduled per node
           limits:
-            #set value based on total available node memory and intended num pods/node
+            #Total node memory resource is about 32 GB for c7g.4xlarge and similar instances, adjust for other node types
             memory: "27000Mi"
           requests:
-            #set value based on total available node memory and intended num pods/node
+            #Total node memory resource is about 32 GB for c7g.4xlarge and similar instances, adjust for other node types
             memory: "27000Mi"
 

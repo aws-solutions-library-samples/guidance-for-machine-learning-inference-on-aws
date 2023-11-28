@@ -52,7 +52,9 @@ spec:
         # Use 'memory' setting in limits and requests to ensure that model pods get scheduled to nodes evenly
           limits:
             cpu: 1
+            #Total node memory resource is about 32 GB for c5.4xlarge and similar instance, adjust for other node types
             #memory: "27000Mi"
          #requests:
+            #Total node memory resource is about 32 GB for c5.4xlarge and similar instance, adjust for other node types
             #memory: "27000Mi"
 
