@@ -9,7 +9,7 @@ print_help() {
 	echo ""
 	echo "Usage: $0 [runtime]"
 	echo ""
-	echo "   runtime - optional [docker|kubernetes}. Target runtime to destroy."
+	echo "   runtime - optional [docker|kubernetes}. Target runtime to remove."
         echo "             if not specified, reads value from ./config.properties"	
 	echo ""
 	echo "   When runtime is kubernetes, this script uses CloudFormation to delete all stacks created by this project's provision script"
@@ -26,10 +26,10 @@ fi
 
 if [ "$runtime" == "kubernetes" ]; then
 	echo ""
-	echo "Destroying project infrastructure ..."
+	echo "Removing project infrastructure ..."
 	
 	echo ""
-	pushd ./6-destroy
+	pushd ./6-remove
 	./cfn-delete.sh
 	popd
 elif [ "$runtime" == "docker" ]; then
@@ -39,3 +39,4 @@ elif [ "$runtime" == "docker" ]; then
 else 
 	print_help
 fi
+
