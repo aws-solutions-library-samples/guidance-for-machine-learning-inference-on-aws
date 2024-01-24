@@ -158,3 +158,5 @@ This library is licensed under the MIT-0 License. See the LICENSE file.
 * [kubetail](https://github.com/johanhaleby/kubetail)
 * [envsubst](https://www.gnu.org/software/gettext/manual/gettext.html#envsubst-Invocation)
 * [AWS Machine Learning blog post](https://aws.amazon.com/blogs/machine-learning/serve-3000-deep-learning-models-on-amazon-eks-with-aws-inferentia-for-under-50-an-hour/)
+* [Guidance for Low Latency, High Throughput Inference on Amazon EKS](https://bit.ly/aws-inference-guidance)
+
