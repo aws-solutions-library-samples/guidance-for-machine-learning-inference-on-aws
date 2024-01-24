@@ -44,7 +44,9 @@ Fig. 2 - aws-do-inference video walkthrough
 See an end-to-end accelerated [video walkthrough](https://bit.ly/aws-do-inference-video) (7 min) or follow the instructions below to build and run your own inference solution.
 
 ## Prerequisites
-It is assumed that an [EKS cluster exists](https://github.com/aws-samples/aws-do-eks) and contains nodegroups of the desired target instance types.
+This sample can be run on a single machine using Docker, or on a Amazon EKS cluster.
+To provision the needed infrastructure, just run the `./provision.sh` script.
+Optionally, you can use an [existing EKS cluster](https://github.com/aws-samples/aws-do-eks/blob/main/wd/conf/eksctl/yaml/eks-inference-workshop.yaml-template) that contains nodegroups of the desired target instance types.
 In addition it is assumed that the following basic tools are present: [docker](https://docs.docker.com/get-docker/), [kubectl](https://kubernetes.io/docs/tasks/tools/), [envsubst](https://command-not-found.com/envsubst), [kubetail](https://github.com/johanhaleby/kubetail), [bc](https://howtoinstall.co/en/bc).
 
 ## Operation
@@ -131,6 +133,10 @@ The test script helps run a number of tests against the model servers deployed i
 * `./test.sh run rnd` - run random test. One request at a time submitted to a randomly selected server and model at a preset frequency.
 * `./test.sh run bmk` - run benchmark test client to measure throughput and latency under load with random requests
 * `./test.sh run bma` - run benchmark analysis - aggregate and average stats from logs of all completed benchmark containers
+
+## Clean up
+If you provisioned an EKS cluster when setting up your prerequisites for the project, you can clean up the cluster and all resources
+associated with it by running the `./remove.sh` script.
 
 ## Security
 
