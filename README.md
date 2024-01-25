@@ -51,6 +51,12 @@ In addition it is assumed that the following basic tools are present: [docker](h
 
 ## Operation
 The project is operated through a set of action scripts as described below. To complete a full cycle from beginning-to-end, first configure the project, then follow steps 1 through 5 executing the corresponding action scripts. Each of the action scripts has a help screen, which can be invoked by passing "help" as argument: `<script>.sh help` 
+### Optional - Provision an EKS cluster with 3 node groups
+```
+./provision.sh
+```
+This script will execute a script that creates a CloudFormation stack which deploys an EC2 "management" instance in the **us-west-2** region. That instance contains a *userData* script that provisions an EKS cluster in **us-west-2** region as well per specification based on the following [template](https://github.com/aws-samples/aws-do-eks/blob/main/wd/conf/eksctl/yaml/eks-inference-workshop.yaml-template) which is a part of another Git repo project. 
+After that EKS cluster is provisoned, it is fully acessible from that EC2 "management" instance and this repository is copied there as well, ready to proceed to next steps.
 
 ### Configure
 ```
@@ -135,8 +141,7 @@ The test script helps run a number of tests against the model servers deployed i
 * `./test.sh run bma` - run benchmark analysis - aggregate and average stats from logs of all completed benchmark containers
 
 ## Clean up
-If you provisioned an EKS cluster when setting up your prerequisites for the project, you can clean up the cluster and all resources
-associated with it by running the `./remove.sh` script.
+If you provisioned an EKS cluster when setting up your prerequisites for the project  as described in the [Provision EKS cluster section](#Optional - Provision EKS Cluster), you can clean up the cluster and all resources associated with it by running the `./remove.sh` script.
 
 ## Security
 
