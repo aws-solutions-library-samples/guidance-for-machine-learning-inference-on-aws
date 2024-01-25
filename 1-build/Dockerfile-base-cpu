@@ -2,14 +2,14 @@ ARG BASE_IMAGE=python:3.9
 
 FROM ${BASE_IMAGE}
 ARG BASE_IMAGE=python:3.9
-ARG FRAMEWORK=fastapi
+ARG MODEL_SERVER=fastapi
 
 
 LABEL description="Base container for CPU models"
 
 USER root
 
-RUN if [ "$FRAMEWORK" = "fastapi" ]; then \
+RUN if [ "$MODEL_SERVER" = "fastapi" ]; then \
         apt-get update && apt-get install -y htop dnsutils bc vim; \
         pip install torch configparser transformers; \
         echo "alias ll='ls -alh --color=auto'" >> /root/.bashrc; \

@@ -39,7 +39,7 @@ if __name__ == '__main__':
     parser.add_argument('--post', default=False, action='store_true')
     parser.add_argument('--verbose', default=False, action='store_true')
     parser.add_argument('--cache_dns', default=False, action='store_true')
-    parser.add_argument('--framework', help='Server framework', type=str,
+    parser.add_argument('--model_server', help='Model Server', type=str,
                         default=f'fastapi')
 
     args, leftovers = parser.parse_known_args()
@@ -53,10 +53,10 @@ if __name__ == '__main__':
     if is_multi_model_per_instance:
         n_model_per_instance = args.n_model_per_instance
 
-    if args.framework == "fastapi":
+    if args.model_server == "fastapi":
         data = {"seq_0": "how many chapters the book has?",
                 "seq_1": """The number 42 is, in The Hitchhiker's Guide to the Galaxy by Douglas Adams."""}
-    elif args.framework == "torchserve":
+    elif args.model_server == "torchserve":
         data = "Bloomberg has decided to publish a new report on global economic situation."
         args.post = True
     live = True

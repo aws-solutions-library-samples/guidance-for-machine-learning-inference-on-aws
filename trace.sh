@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: MIT-0                                     #
 ######################################################################
 
-FRAMEWORK=fastapi
+MODEL_SERVER=fastapi
 
 print_help() {
 	echo ""
@@ -21,7 +21,7 @@ print_help() {
 if [ "$1" == "" ]; then 
 	source ./config.properties
 	echo ""
-	if [ "$framework" == "torchserve" ]
+	if [ "$model_server" == "torchserve" ]
 	then
 		echo "Skipping Tracing model: $huggingface_model_name  for TorchServe..."
 	else	

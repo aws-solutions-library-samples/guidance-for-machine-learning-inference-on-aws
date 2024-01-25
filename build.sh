@@ -6,7 +6,7 @@
 ######################################################################
 
 BASE_IMAGE=python:3.9
-FRAMEWORK=fastapi
+MODEL_SERVER=fastapi
 
 print_help() {
 	echo ""
@@ -27,10 +27,10 @@ action=$1
 if [ "$action" == "" ]; then
 	source ./config.properties
 
-	if [ "$framework" == "torchserve" ]
+	if [ "$model_server" == "torchserve" ]
 	then
   	BASE_IMAGE=pytorch/torchserve:latest-cpu
-	FRAMEWORK=torchserve
+	MODEL_SERVER=torchserve
 	fi
 
 	echo ""
@@ -40,7 +40,7 @@ if [ "$action" == "" ]; then
 	dockerfile=./1-build/Dockerfile-base-${processor}
 	if [ -f $dockerfile ]; then
 		echo "    ... base-${processor} ... "
-		docker build --build-arg BASE_IMAGE="${BASE_IMAGE}" --build-arg FRAMEWORK="${FRAMEWORK}" -t ${registry}${base_image_name}${base_image_tag} -f $dockerfile .
+		docker build --build-arg BASE_IMAGE="${BASE_IMAGE}" --build-arg MODEL_SERVER="${MODEL_SERVER}" -t ${registry}${base_image_name}${base_image_tag} -f $dockerfile .
 	else
 		echo "Dockerfile $dockerfile was not found."
 	        echo "Please ensure that processor is configured with a supported value in config.properties"
