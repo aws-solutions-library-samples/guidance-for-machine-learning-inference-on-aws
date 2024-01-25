@@ -1,6 +1,6 @@
-# Inference workload deployment sample with optional bin-packing
-The aws-do-inference repository contains an end-to-end example for running model inference locally on Docker or at scale on EKS. 
-It supports CPU, GPU, and Inferentia processors and can pack multiple models in a single processor core for improved cost efficiency.
+# Machine Learing Inference workload deployment sample with optional bin-packing
+The **guidance-for-machine-learning-inference-on-aws repository** contains an end-to-end example for running model inference locally on Docker or at scale on Amazon EKS Kubernetes cluster. 
+It supports CPU, GPU, Graviton and Inferentia processors and can pack multiple models in a single processor core for improved cost efficiency.
 While this example focuses on one processor target at a time, iterating over the steps below for CPU/GPU and Inferentia 
 enables hybrid deployments where the best processor/accelerator is used to serve each model depending on its resource consumption profile.
 In this sample repository, we use a [bert-base](https://huggingface.co/distilbert-base-multilingual-cased) NLP model from [huggingface.co](https://huggingface.co/), however the project structure and workflow is generic and can be adapted for use with other models.
@@ -37,7 +37,7 @@ to the Model service pool. Performance Test results metrics are obtained, recor
 <div align="center">
 <a href="https://www.youtube.com/watch?v=g9XRhGhQhAE"><img src="./aws-do-inference-video.png" width="90%"></a>
 </br>
-Fig. 2 - aws-do-inference video walkthrough
+Fig. 2 - ML Inference video walkthrough
 </div>
 <br/>
 
@@ -141,7 +141,10 @@ The test script helps run a number of tests against the model servers deployed i
 * `./test.sh run bma` - run benchmark analysis - aggregate and average stats from logs of all completed benchmark containers
 
 ## Clean up
-If you provisioned an EKS cluster when setting up your prerequisites for the project  as described in the [Provision EKS cluster section](#Optional - Provision EKS Cluster), you can clean up the cluster and all resources associated with it by running the `./remove.sh` script.
+If you provisioned an EKS cluster when setting up your prerequisites for the project  as described in the **Optional - Provision an EKS Cluster** section above, you can clean up the cluster and all resources associated with it by running this script:
+```
+./remove.sh
+```
 
 ## Security
 
