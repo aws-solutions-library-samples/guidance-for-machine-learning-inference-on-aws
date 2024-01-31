@@ -14,7 +14,7 @@ Fig. 1 - Sample Amazon EKS cluster infrastructure for deploying, running and tes
 
 The ML inference workloads in this sample project are deployed on the CPU, GPU, or Inferentia nodes as shown on Fig. 1. The control scripts run in any location that has access to the cluster API. To eliminate latency concern related to the cluster ingress, load tests run in a pod within the cluster and send requests to the models directly through the cluster pod network.
 <div align="left">
-1. The Amazon EKS cluster has several node groups, with one EC2 instance family per node group. Each node group can support different instance types, such as CPU (c5,c6i, c7g), GPU (g4dn), AWS Inferentia (Inf2)
+1. The Amazon EKS cluster has several node groups, with one EC2 instance family per node group. Each node group can support different instance types, such as CPU (c5,c6i,c7g), GPU (g4dn), AWS Inferentia (Inf2)
 and can pack multiple models per EKS node to maximize the number of served ML models that are running in a node group. 
 Model bin packing is used to maximize compute and memory utilization of the compute node EC2 instances in the cluster node groups.
 <br/>  
@@ -40,7 +40,7 @@ Fig. 2 - ML Inference video walkthrough
 </div>
 <br/>
 
-See an end-to-end accelerated [video walkthrough](https://bit.ly/aws-do-inference-video) (7 min) or follow the instructions below to build and run your own inference solution.
+Please watch this end-to-end accelerated [video walkthrough](https://bit.ly/aws-do-inference-video) (7 min) or follow the instructions below to build and run your own inference solution.
 
 ## Prerequisites
 This sample can be run on a single machine using Docker, or on a Amazon EKS cluster.
