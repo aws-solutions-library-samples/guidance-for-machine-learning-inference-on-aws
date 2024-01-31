@@ -6,8 +6,7 @@ enables hybrid deployments where the best processor/accelerator is used to serve
 In this sample repository, we use a [bert-base](https://huggingface.co/distilbert-base-multilingual-cased) NLP model from [huggingface.co](https://huggingface.co/), however the project structure and workflow is generic and can be adapted for use with other models.
 
 <div align="center">
-<!--img src="./aws-do-inference.png" width="90%"-->
-<img src="./low-latency-high-throughput-inference-on-amazon-eks.png" width="90%">  
+<img src="./low-latency-high-bandwidth-updated-architecture.jpeg" width="90%">  
 <br/>
 Fig. 1 - Sample Amazon EKS cluster infrastructure for deploying, running and testing ML Inference workloads
 </div>
@@ -45,17 +44,20 @@ See an end-to-end accelerated [video walkthrough](https://bit.ly/aws-do-inferenc
 
 ## Prerequisites
 This sample can be run on a single machine using Docker, or on a Amazon EKS cluster.
-To provision the needed infrastructure, just run the `./provision.sh` script.
-Optionally, you can use an [existing EKS cluster](https://github.com/aws-samples/aws-do-eks/blob/main/wd/conf/eksctl/yaml/eks-inference-workshop.yaml-template) that contains nodegroups of the desired target instance types.
-In addition it is assumed that the following basic tools are present: [docker](https://docs.docker.com/get-docker/), [kubectl](https://kubernetes.io/docs/tasks/tools/), [envsubst](https://command-not-found.com/envsubst), [kubetail](https://github.com/johanhaleby/kubetail), [bc](https://howtoinstall.co/en/bc).
+
+It is assumed that the following basic tools are present: [docker](https://docs.docker.com/get-docker/), [kubectl](https://kubernetes.io/docs/tasks/tools/), [envsubst](https://command-not-found.com/envsubst), [kubetail](https://github.com/johanhaleby/kubetail), [bc](https://howtoinstall.co/en/bc).
 
 ## Operation
+
 The project is operated through a set of action scripts as described below. To complete a full cycle from beginning-to-end, first configure the project, then follow steps 1 through 5 executing the corresponding action scripts. Each of the action scripts has a help screen, which can be invoked by passing "help" as argument: `<script>.sh help` 
+
 ### Optional - Provision an EKS cluster with 3 node groups
+To provision the needed EKS cluster infrastructure, just run the `./provision.sh` script.
+Optionally, you can use an [existing EKS cluster](https://github.com/aws-samples/aws-do-eks/blob/main/wd/conf/eksctl/yaml/eks-inference-workshop.yaml-template) that contains nodegroups of the desired target instance types.
 ```
 ./provision.sh
 ```
-This script will execute a script that creates a CloudFormation stack which deploys an EC2 "management" instance in the **us-west-2** region. That instance contains a *userData* script that provisions an EKS cluster in **us-west-2** region as well per specification based on the following [template](https://github.com/aws-samples/aws-do-eks/blob/main/wd/conf/eksctl/yaml/eks-inference-workshop.yaml-template) which is a part of another Git repo project. 
+This command will execute a script that creates a CloudFormation stack which deploys an EC2 "management" instance in your default AWS region. That instance contains a *userData* script that provisions an EKS cluster in **us-west-2** region as well per specification based on the following [template](https://github.com/aws-samples/aws-do-eks/blob/main/wd/conf/eksctl/yaml/eks-inference-workshop.yaml-template) which is a part of another Git repo project. 
 After that EKS cluster is provisoned, it is fully acessible from that EC2 "management" instance and this repository is copied there as well, ready to proceed to next steps.
 
 ### Configure
@@ -141,10 +143,26 @@ The test script helps run a number of tests against the model servers deployed i
 * `./test.sh run bma` - run benchmark analysis - aggregate and average stats from logs of all completed benchmark containers
 
 ## Clean up
-If you provisioned an EKS cluster when setting up your prerequisites for the project  as described in the **Optional - Provision an EKS Cluster** section above, you can clean up the cluster and all resources associated with it by running this script:
+
+You can uninstall the sample code for this Guidance using the AWS Command Line Interface. You must also delete the EKS cluster if it was deployed using references from this Guidance, since removal of the scale testing framework does not automatically delete Cluster and its resources.
+
+To stop or uninstall scale Inferencetest job(s), run the following command:
+```shell
+./test.sh stop
+```
+It should delete all scale test pods and jobs from the specified EKS K8s namespace.
+
+To stop or uninstall Inference model services, run the following command:
+```shell
+./deploy.sh stop
+```
+It should delete all Model deployments, pods, and services from the specified EKS K8s namespace.
+
+If you provisioned an EKS cluster when setting up your prerequisites for the project  as described in the "Optional - Provision an EKS cluster with 3 node groups" above, you can clean up the cluster and all resources associated with it by running this script:
 ```
 ./remove.sh
 ```
+It should delete EKS cluster compute node groups first, then IAM service account used in that cluster, then cluster itself and, finally, ManagementInstance EC2 instance via corresponding Cloud Formations. Sometimes you may need to run that command a few times as individual stack deletion commands may time out - that should not create any problem.
 
 ## Security
 
