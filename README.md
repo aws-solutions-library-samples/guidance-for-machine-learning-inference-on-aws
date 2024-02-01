@@ -18,17 +18,15 @@ The ML inference workloads in this sample project are deployed on the CPU, GPU, 
 and can pack multiple models per EKS node to maximize the number of served ML models that are running in a node group. 
 Model bin packing is used to maximize compute and memory utilization of the compute node EC2 instances in the cluster node groups.
 <br/>  
-2. The natural language processing (NLP) open-source PyTorch model from [huggingface.co](https://huggingface.co/) serving application and ML framework dependencies are built by Users as container images
-using Automation framework uploaded to Amazon Elastic Container Registry - [Amazon ECR](https://aws.amazon.com/ecr/).
+2. The natural language processing (NLP) open-source PyTorch model from [huggingface.co](https://huggingface.co/) serving application and ML framework dependencies are built by Users as container images using Automation framework uploaded to Amazon Elastic Container Registry - [Amazon ECR](https://aws.amazon.com/ecr).
 <br/>
-3. Using project Automation framework, Model container images are obtained from ECR and deployed to [Amazon EKS cluster](https://aws.amazon.com/eks/) using generated Deployment and Service manifests via Kubernetes API
-exposed via Elastic Load Balancer (ELB). Model deployments are customized for each target EKS compute node instance type via settings in the central configuration file.
+3. Using project Automation framework, Model container images are obtained from Amazon ECR and deployed to [Amazon EKS cluster](https://aws.amazon.com/eks/) using generated Deployment and Service manifests via calls to Kubernetes API exposed via [Elastic Load Balancer](https://aws.amazon.com/elasticloadbalancing/) (ELB). Model deployments are customized for each target EKS compute node  processor architecture via settings in the central configuration file.
 <br/>
-4. Following best practices of separation of Model data from containers that run it, ML model microservice design allows to scale out to a large number of models. In the project, model containers are pulling data from
+4. Following best practices of separation of Model data from containers that run it, ML model microservice design allows to scale out to a large number of models. In this project, model containers are pulling model data from
 Amazon Simple Storage Service ([Amazon S3](https://aws.amazon.com)) and other public model data sources each time they are initialized. 
 <br/>
-5. Using project Automation framework, Test container images are obtained from ECR and deployed to Amazon EKS cluster using generated Deployment and Service manifests via Kubernetes API. 
-Test deployments are customized for each deployment target EKS compute node architecture via settings in the central configuration file. Load/scale testing is performed via sending simultaneous requests
+5. Using project Automation framework, Test container images are obtained from ECR registry and deployed to Amazon EKS cluster using generated Deployment and Service manifests via Kubernetes API. 
+Test deployments are customized for each deployment target EKS compute node processor architecture via settings in the central configuration file. Load/scale testing is performed via sending simultaneous requests
 to the Model service pool. Performance Test results metrics are obtained, recorded and aggregated.
 <br/>
 </div>
