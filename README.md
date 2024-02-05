@@ -1,5 +1,5 @@
-# Machine Learing Inference workload deployment sample with optional bin-packing
-The **guidance-for-machine-learning-inference-on-aws repository** contains an end-to-end example for running model inference locally on Docker or at scale on Amazon EKS Kubernetes cluster. 
+# Guidance for Low Latency, High Throughput Inference using Efficient Compute on Amazon EKS
+The **guidance-for-machine-learning-inference-on-aws** repository contains an end-to-end automation faremework example for running model inference locally on Docker or at scale on Amazon EKS Kubernetes cluster. 
 It supports EKS compute nodes based on CPU, GPU, Graviton and Inferentia processor architecture  and can pack multiple models in a single processor core for improved cost efficiency.
 While this example focuses on one processor target at a time, iterating over the steps below for CPU/GPU and Inferentia 
 enables hybrid deployments where the best processor/accelerator is used to serve each model depending on its resource consumption profile.
