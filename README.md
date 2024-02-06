@@ -1,8 +1,7 @@
-# Machine Learing Inference workload deployment sample with optional bin-packing
-The **guidance-for-machine-learning-inference-on-aws repository** contains an end-to-end example for running model inference locally on Docker or at scale on Amazon EKS Kubernetes cluster. 
-It supports EKS compute nodes based on CPU, GPU, Graviton and Inferentia processor architecture  and can pack multiple models in a single processor core for improved cost efficiency.
-While this example focuses on one processor target at a time, iterating over the steps below for CPU/GPU and Inferentia 
-enables hybrid deployments where the best processor/accelerator is used to serve each model depending on its resource consumption profile.
+# Guidance for Low Latency, High Throughput Inference using Efficient Compute on Amazon EKS
+The [**guidance-for-machine-learning-inference-on-aws**](https://github.com/aws-solutions-library-samples/guidance-for-machine-learning-inference-on-aws) repository contains an end-to-end automation faremework example for running model inference locally on Docker or at scale on Amazon EKS Kubernetes cluster. 
+It supports EKS compute nodes based on CPU, GPU, Graviton and Inferentia processor architectures  and can pack multiple models in a single processor core for improved cost efficiency.
+While this example focuses on one processor architecture at a time, iterating over the steps below for various CPU/GPU Efficient Compute and Inferentia architectures enables hybrid deployments where the best processor/accelerator is used to serve each model depending on its resource consumption profile.
 In this sample repository, we use a [bert-base](https://huggingface.co/distilbert-base-multilingual-cased) NLP model from [huggingface.co](https://huggingface.co/), however the project structure and workflow is generic and can be adapted for use with other models.
 
 <div align="center">
@@ -18,12 +17,12 @@ The ML inference workloads in this sample project are deployed on the CPU, GPU, 
 and can pack multiple models per EKS node to maximize the number of served ML models that are running in a node group. 
 Model bin packing is used to maximize compute and memory utilization of the compute node EC2 instances in the cluster node groups.
 <br/>  
-2. The natural language processing (NLP) open-source PyTorch model from [huggingface.co](https://huggingface.co/) serving application and ML framework dependencies are built by users as container images using Automation framework uploaded to Amazon Elastic Container Registry - [Amazon ECR](https://aws.amazon.com/ecr).
+2. The natural language processing (NLP) open-source PyTorch model from [huggingface.co](https://huggingface.co) serving application and ML framework dependencies are built by users as container images using Automation framework uploaded to Amazon Elastic Container Registry - [Amazon ECR](https://aws.amazon.com/ecr).
 <br/>
-3. Using project Automation framework, Model container images are obtained from Amazon ECR and deployed to [Amazon EKS cluster](https://aws.amazon.com/eks/) using generated Deployment and Service manifests via calls to Kubernetes API exposed via [Elastic Load Balancer](https://aws.amazon.com/elasticloadbalancing/) (ELB). Model deployments are customized for each target EKS compute node  processor architecture via settings in the central configuration file.
+3. Using project Automation framework, Model container images are obtained from Amazon ECR and deployed to [Amazon EKS cluster](https://aws.amazon.com/eks) using generated Deployment and Service manifests via calls to Kubernetes API exposed via [Elastic Load Balancer](https://aws.amazon.com/elasticloadbalancing) (ELB). Model deployments are customized for each target EKS compute node  processor architecture via settings in the central configuration file.
 <br/>
 4. Following best practices of separation of Model data from containers that run it, ML model microservice design allows to scale out to a large number of models. In this project, model containers are pulling model data from
-Amazon Simple Storage Service ([Amazon S3](https://aws.amazon.com)) and other public model data sources each time they are initialized. 
+Amazon Simple Storage Service ( [Amazon S3](https://aws.amazon.com/s3) ) and other public model data sources each time they are initialized. 
 <br/>
 5. Using project Automation framework, Test container images are obtained from ECR registry and deployed to EKS cluster using generated Deployment and Service manifests via Kubernetes API. 
 Test deployments are customized for each deployment target EKS compute node processor architecture via settings in the central configuration file. Load/scale testing is performed via sending simultaneous requests
