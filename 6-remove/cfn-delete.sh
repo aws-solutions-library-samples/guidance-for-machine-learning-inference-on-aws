@@ -2,19 +2,19 @@
 
 echo ""
 echo "Deleting node groups, IAM service account and EKS cluster eksctl-eks-inference-workshop ..."
-aws cloudformation delete-stack --stack-name eksctl-eks-inference-workshop-nodegroup-inf
-aws cloudformation wait stack-delete-complete --stack-name eksctl-eks-inference-workshop-nodegroup-inf
-aws cloudformation delete-stack --stack-name eksctl-eks-inference-workshop-nodegroup-cpu
-aws cloudformation wait stack-delete-complete --stack-name eksctl-eks-inference-workshop-nodegroup-cpu
-aws cloudformation delete-stack --stack-name eksctl-eks-inference-workshop-nodegroup-graviton
-aws cloudformation wait stack-delete-complete --stack-name eksctl-eks-inference-workshop-nodegroup-graviton
-aws cloudformation delete-stack --stack-name eksctl-eks-inference-workshop-addon-iamserviceaccount-kube-system-aws-node
-aws cloudformation wait stack-delete-complete --stack-name eksctl-eks-inference-workshop-addon-iamserviceaccount-kube-system-aws-node
-aws cloudformation delete-stack --stack-name eksctl-eks-inference-workshop-cluster
-aws cloudformation wait stack-delete-complete --stack-name eksctl-eks-inference-workshop-cluster
+aws cloudformation delete-stack --stack-name eksctl-eks-inference-workshop-nodegroup-inf --region us-west-2
+aws cloudformation wait stack-delete-complete --stack-name eksctl-eks-inference-workshop-nodegroup-inf --region us-west-2
+aws cloudformation delete-stack --stack-name eksctl-eks-inference-workshop-nodegroup-cpu --region us-west-2
+aws cloudformation wait stack-delete-complete --stack-name eksctl-eks-inference-workshop-nodegroup-cpu --region us-west-2
+aws cloudformation delete-stack --stack-name eksctl-eks-inference-workshop-nodegroup-graviton --region us-west-2
+aws cloudformation wait stack-delete-complete --stack-name eksctl-eks-inference-workshop-nodegroup-graviton --region us-west-2
+aws cloudformation delete-stack --stack-name eksctl-eks-inference-workshop-addon-iamserviceaccount-kube-system-aws-node --region us-west-2
+aws cloudformation wait stack-delete-complete --stack-name eksctl-eks-inference-workshop-addon-iamserviceaccount-kube-system-aws-node --region us-west-2
+aws cloudformation delete-stack --stack-name eksctl-eks-inference-workshop-cluster --region us-west-2
+aws cloudformation wait stack-delete-complete --stack-name eksctl-eks-inference-workshop-cluster --region us-west-2
 
 echo ""
-echo "Finished deletion of eksctl-eks-inference-workshop CF stack!Now will delete  EC2 Management Instance stack ..."
+echo "Finished deletion of eksctl-eks-inference-workshop CF stack in us-west-2 region. Now deleting  EC2 Management Instance stack in your default region ..."
 aws cloudformation delete-stack --stack-name ManagementInstance
 aws cloudformation wait stack-delete-complete --stack-name ManagementInstance
 

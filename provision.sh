@@ -28,7 +28,7 @@ fi
 
 if [ "$runtime" == "kubernetes" ]; then
 	echo ""
-	echo "Provisioning project infrastructure ..."
+	echo "Provisioning Management Instance and EKS cluster infrastructure ..."
 	
 	echo ""
 	pushd ./0-provision
@@ -36,7 +36,7 @@ if [ "$runtime" == "kubernetes" ]; then
 	popd
 elif [ "$runtime" == "docker" ]; then
         echo ""
-        echo "No additional project inrastructure is required for runtime: $runtime"
+        echo "No additional infrastructure is required for runtime: $runtime..."
         echo ""       
 else 
 	print_help

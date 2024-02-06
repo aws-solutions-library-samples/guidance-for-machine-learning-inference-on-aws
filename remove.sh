@@ -26,7 +26,7 @@ fi
 
 if [ "$runtime" == "kubernetes" ]; then
 	echo ""
-	echo "Removing project infrastructure ..."
+	echo "Removing EKS cluster and Management instance infrastructure ..."
 	
 	echo ""
 	pushd ./6-remove
@@ -34,7 +34,7 @@ if [ "$runtime" == "kubernetes" ]; then
 	popd
 elif [ "$runtime" == "docker" ]; then
         echo ""
-        echo "No additional project asset cleanup is required for runtime: $runtime"
+        echo "No additional project asset cleanup is required for runtime: $runtime..."
         echo ""       
 else 
 	print_help
