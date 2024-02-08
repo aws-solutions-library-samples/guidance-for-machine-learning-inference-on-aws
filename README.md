@@ -7,27 +7,20 @@ In this sample repository, we use a [bert-base](https://huggingface.co/distilber
 <div align="center">
 <img src="./low-latency-high-bandwidth-updated-architecture.jpg" width="90%">  
 <br/>
-Fig. 1 - Sample Amazon EKS cluster infrastructure for deploying, running and testing ML Inference workloads
+Fig. 1 - Sample Amazon EKS cluster infrastructure and deploying, running and testing of ML Inference workloads
 </div>
 <br/>
 
-The ML inference workloads in this sample project are deployed on the CPU, GPU, or Inferentia nodes as shown on Fig. 1. The control scripts run in any location that has access to the cluster API. To eliminate latency concern related to the cluster ingress, load tests run in a pod within the cluster and send requests to the models directly through the cluster pod network.
+The ML inference workloads in this project are deployed on the CPU, GPU, or Inferentia based EKS compute nodes as shown on Fig. 1. 
+The control scripts may run in any location that has a full access to the cluster Kubernetes API. To eliminate latency concern related to the EKS cluster ingress, load tests run in pods deployed within the same cluster and send requests to the models directly through the cluster pod network.
+
 <div align="left">
-1. The Amazon EKS cluster has several node groups, with one EC2 instance family per node group. Each node group can support different instance types, such as CPU (c5,c6i,c7g etc.), GPU (g4dn etc.), AWS Inferentia (Inf2)
-and can pack multiple ML models per EKS node to maximize the number of served  models that are running in a node group. 
-Model bin packing is used to maximize compute and memory utilization of the compute node EC2 instances in the cluster node groups.
-<br/>  
-2. The natural language processing (NLP) open-source PyTorch model from [huggingface.co](https://huggingface.co) serving application and ML framework dependencies are built by users as container images using Automation framework uploaded to Amazon Elastic Container Registry - [Amazon ECR](https://aws.amazon.com/ecr).
-<br/>
-3. Using project Automation framework, Model container images are obtained from Amazon ECR and deployed to [Amazon EKS cluster](https://aws.amazon.com/eks) using generated Deployment and Service manifests via calls to Kubernetes API exposed via [Elastic Load Balancer](https://aws.amazon.com/elasticloadbalancing) (ELB). Model deployments are customized for each target EKS compute node processor architecture via settings in the central configuration file [config.properties](https://github.com/aws-solutions-library-samples/guidance-for-machine-learning-inference-on-aws/blob/main/config.properties)
-<br/>
-4. Following best practices of separation of Model data from containers that run it, ML model microservice design allows to scale out to a large number of models. In this project, model containers are pulling model data from
-Amazon Simple Storage Service ([Amazon S3](https://aws.amazon.com/s3)) and other public model data sources each time they are initialized. 
-<br/>
-5. Using project Automation framework, Test container images are obtained from ECR registry and deployed to EKS cluster using generated Deployment and Service manifests via Kubernetes API. 
-Test deployments are customized for each deployment target EKS compute node processor architecture via settings in the central configuration file. Load/scale testing is performed via sending simultaneous requests
-to the Model service pool. Performance Test results metrics are obtained, recorded and aggregated.
-<br/>
+
+1. The Amazon EKS cluster has several node groups, with one Amazon EC2 instance family for each node group. Each node group can support different instance types, such as CPU (C5,C6i, C7gn), GPU (G4dn), [AWS Inferentia](https://aws.amazon.com/machine-learning/inferentia/) (inf1, inf2) and can pack multiple models for each EKS node to maximize the number of served ML models that are running in a node group. Model bin packing is used to maximize compute and memory utilization of the Amazon EC2 instances in the cluster node groups.
+2. The natural language processing (NLP) open-source PyTorch model from [Hugging Face](https://huggingface.co/), serving application and ML framework dependencies, are built by users as container images use an automation framework. These images are uploaded to Amazon Elastic Container Registry - [Amazon ECR](https://aws.amazon.com/ecr/).
+3. Using the automation framework, the model container images are obtained from Amazon ECR and deployed to an [Amazon EKS cluster](https://aws.amazon.com/eks/) using generated deployment and service manifests through the Kubernetes API (exposed through Elastic Load Balancing (ELB)). Model deployments are customized for each deployment target EKS compute node instance type through settings in the central configuration [file](https://github.com/aws-solutions-library-samples/guidance-for-machine-learning-inference-on-aws/blob/main/config.properties). 
+4. Following the best practices of the separation of model data from containers that run it, the ML model microservice design allows it to scale out to a large number of models. In the sample project, model containers are pulling data from Amazon Simple Storage Service ([Amazon S3](https://aws.amazon.com)) and other public model data sources each time they are initialized. 
+5. Using the automation framework, the test container images are deployed to  an Amazon EKS cluster using generated deployment and service manifests through the Kubernetes API. Test deployments are customized for each deployment target EKS compute node instance type through settings in the central configuration [file](https://github.com/aws-solutions-library-samples/guidance-for-machine-learning-inference-on-aws/blob/main/config.properties). Load or scale testing is performed by sending simultaneous requests to the model service pool from test pods. Performance test results and metrics are obtained, recorded, and aggregated.  
 </div>
 <br/><br/>
 <div align="center">
@@ -172,10 +165,10 @@ This library is licensed under the MIT-0 License. See the LICENSE file.
 ## References
 
 * [Huggingface](https://huggingface.co)
-* [EKS](https://aws.amazon.com/eks)
+* [AWS EKS](https://aws.amazon.com/eks)
 * [aws-do-eks](https://github.com/aws-samples/aws-do-eks)
 * [FastAPI](https://fastapi.tiangolo.com/)
-* [AWS GPU](https://aws.amazon.com/nvidia/#_AWS_and_NVIDIA_Services)
+* [AWS GPU](https://aws.amazon.com/machine-learning/accelerate-machine-learning-P3/)
 * [AWS Inferentia](https://aws.amazon.com/machine-learning/inferentia/)
 * [Instance Selector](https://instances.vantage.sh/?selected=inf1.6xlarge)
 * [kubetail](https://github.com/johanhaleby/kubetail)
