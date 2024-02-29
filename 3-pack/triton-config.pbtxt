@@ -1,0 +1,22 @@
+name: "${TRITON_MODEL_NAME}"
+backend: "python"
+max_batch_size: 1
+input [
+  {
+    name: "seq_0"
+    data_type: TYPE_STRING
+    dims: [-1]
+  },
+  {
+    name: "seq_1"
+    data_type: TYPE_STRING
+    dims: [-1]
+  }
+]
+output [
+  {
+    name: "answer"
+    data_type: TYPE_STRING
+    dims: [-1]
+  }
+]

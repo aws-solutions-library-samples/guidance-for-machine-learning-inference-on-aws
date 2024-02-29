@@ -44,7 +44,7 @@ sequence_length=int(config['global']['sequence_length'])
 processor=config['global']['processor']
 pipeline_cores=config['global']['pipeline_cores']
 batch_size=int(config['global']['batch_size'])
-test=config['global']['test']
+test=config['global']['test_traced_model']
 
 question = "What does the little engine say?"
 
@@ -90,9 +90,9 @@ example_inputs = (
     torch.cat([inputs['input_ids']] * batch_size,0), 
     torch.cat([inputs['attention_mask']] * batch_size,0)
 )
-os.makedirs(f'traced-{model_name}', exist_ok=True)
 torch.set_num_threads(6)
-if 'inf' == processor:
+os.makedirs(f'traced-{model_name}', exist_ok=True)
+if 'inf1' == processor:
     model_traced = torch.neuron.trace(model, 
                                   example_inputs, 
                                   verbose=1, 
@@ -102,26 +102,59 @@ elif 'inf2' == processor:
     model_traced = torch_neuronx.trace(model,
                                   example_inputs)
 else:
+    torch.jit.fuser('off')
+    torch._C._jit_override_can_fuse_on_cpu(False)
+    torch._C._jit_override_can_fuse_on_gpu(False)
+    torch._C._jit_set_texpr_fuser_enabled(False)
+    torch._C._jit_set_nvfuser_enabled(False)
     model_traced = torch.jit.trace(model, example_inputs)
     
-# 3. TEST THE COMPILED MODEL (Optional)        
-if test.lower() == 'true':
-    print("\nTesting traced model ...")
-    print(f"Question: {question}")
-    # Testing the traced model
-    answer_logits = model_traced(*example_inputs)
-    answer_start = answer_logits[0].argmax().item()
-    answer_end = answer_logits[1].argmax().item()+1
-    answer_txt = ""
-    if answer_end > answer_start:
-        answer_txt = tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(inputs["input_ids"][0][answer_start:answer_end]))
-    else:
-        answer_txt = tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(inputs["input_ids"][0][answer_start:]))
-    print(f'Model Answer: {answer_txt}')
-
-# 4. SAVE THE COMPILED MODEL
+# 3. SAVE THE COMPILED MODEL
 print('\nSaving traced model ...')
 model_path=f'./traced-{model_name}/{model_name}_bs{batch_size}_seq{sequence_length}_pc{pipeline_cores}_{processor}.pt'
 model_traced.save(model_path)
+print(f'Model saved as: {model_path}')
 
-print(f'Done. Model saved as: {model_path}')
+# 4. TEST THE COMPILED MODEL (Optional)        
+if test.lower() == 'true':
+    print("\nTesting traced model ...")
+    print(f"Question: {question}")
+    encoded_input = tokenizer.encode_plus(question, context, return_tensors='pt', max_length=128, padding='max_length', truncation=True)
+    if processor=='gpu':
+        encoded_input.to(device)
+
+    model_input = (encoded_input['input_ids'], encoded_input['attention_mask'])
+    
+    #print("=========================================")
+    #print("encoded_input['input_ids']=")
+    #print(encoded_input['input_ids'])
+    #print("encoded_input['attention_mask']=")
+    #print(encoded_input['attention_mask'])
+    #print("model_input=")
+    #print(model_input)
+    #print("=========================================")
+    
+    # Testing the traced model
+    answer_logits = model_traced(*model_input)
+    answer_start = answer_logits[0].argmax().item()
+    answer_end = answer_logits[1].argmax().item()+1
+    
+    #print("=========================================")
+    #print("answer_logits=")
+    #print(answer_logits)
+    #print("anser_logits[0]=")
+    #print(answer_logits[0])
+    #print("answer_logits[1]=")
+    #print(answer_logits[1])
+    #print("=========================================")
+    
+    answer_txt = ""
+    if answer_end > answer_start:
+        print(f"answer_end ( {answer_end} ) > answer_start ( {answer_start} )")
+        answer_txt = tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(inputs["input_ids"][0][answer_start:answer_end]))
+    else:
+        print(f"answer_end ( {answer_end} ) <= answer_start ( {answer_start} )")
+        answer_txt = tokenizer.convert_tokens_to_string(tokenizer.convert_ids_to_tokens(inputs["input_ids"][0][answer_start:]))
+    print(f'Model Answer: {answer_txt}')
+
+print(f'Done.')

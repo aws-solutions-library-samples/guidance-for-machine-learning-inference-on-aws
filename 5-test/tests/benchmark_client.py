@@ -8,6 +8,7 @@ import argparse
 import time
 import numpy as np
 import requests
+import json
 import sys
 import random
 from concurrent import futures
@@ -24,7 +25,7 @@ from urllib.parse import urlparse
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--url', help='FastAPI model URL', type=str,
+    parser.add_argument('--url', help='Model URL', type=str,
                         default=f'http://localhost:8080/predictions/model0')
     # parser.add_argument('--url', help='FastAPI model URL', type=str, default=f'http://instance[INSTANCE_IDX].scale.svc.cluser.local:8000/predictions/model[MODEL_IDX]')
     parser.add_argument('--num_thread', type=int, default=2, help='Number of threads invoking the model URL')
@@ -39,6 +40,7 @@ if __name__ == '__main__':
     parser.add_argument('--post', default=False, action='store_true')
     parser.add_argument('--verbose', default=False, action='store_true')
     parser.add_argument('--cache_dns', default=False, action='store_true')
+    parser.add_argument('--model_server', help="Model server: fastapi | triton | torchserve", default="fastapi")
 
     args, leftovers = parser.parse_known_args()
 
@@ -50,9 +52,17 @@ if __name__ == '__main__':
     is_multi_model_per_instance = args.is_multi_model_per_instance
     if is_multi_model_per_instance:
         n_model_per_instance = args.n_model_per_instance
+    model_server=args.model_server
 
-    data = {'seq_0': "how many chapters the book has?",
-            'seq_1': """The number 42 is, in The Hitchhiker's Guide to the Galaxy by Douglas Adams."""}
+    data = {}
+    headers = {}
+    if model_server == 'fastapi':
+        data = {'seq_0': "How many chapters does the book have?",
+                'seq_1': """The number 42 is, in The Hitchhiker's Guide to the Galaxy by Douglas Adams."""}
+    elif model_server == 'triton':
+        data = {"inputs":[{"name":"seq_0","shape":[1,1],"datatype":"BYTES","data":["What does the little engine say"]},{"name":"seq_1","shape":[1,1],"datatype":"BYTES","data":["In the childrens story about the little engine a small locomotive is pulling a large load up a mountain. Since the load is heavy and the engine is small it is not sure whether it will be able to do the job. This is a story about how an optimistic attitude empowers everyone to achieve more. In the story the little engine says: \"I think I can\" as it is pulling the heavy load all the way to the top of the mountain. On the way down it says: \"I thought I could\"."]}]}
+        headers = {'Content-Type': 'application/json'}
+
     live = True
     num_infer = 0
     latency_list = []
@@ -73,6 +83,8 @@ if __name__ == '__main__':
             pred_replace = pred_replace.replace('[INSTANCE_IDX]', str(idx_instance))
         if is_multi_model_per_instance:
             idx_model_per_instance = random.choice(range(n_model_per_instance))
+            if model_server == "triton":
+                idx_model_per_instance=idx_model_per_instance+1
             pred_replace = pred_replace.replace('[MODEL_IDX]', str(idx_model_per_instance))
         print(args)
         if args.cache_dns:
@@ -91,7 +103,10 @@ if __name__ == '__main__':
         if args.verbose:
             print(pred_replace)
         if args.post:
-            result = session.post(pred_replace, data=feed_data)
+            if model_server == "triton": 
+                result = session.post(pred_replace, headers=headers, data=json.dumps(feed_data))
+            else:
+                result = session.post(pred_replace, data=feed_data)
         else:
             result = session.get(pred_replace)
         print(result)
@@ -110,12 +125,14 @@ if __name__ == '__main__':
             start = time.time()
             pred_replace = pred
             idx_instance = 0
-            idx_model_per_instance = None
+            idx_model_per_instanc = None
             if is_multi_instance:
                 idx_instance = random.choice(range(n_instance))
                 pred_replace = pred_replace.replace('[INSTANCE_IDX]', str(idx_instance))
             if is_multi_model_per_instance:
                 idx_model_per_instance = random.choice(range(n_model_per_instance))
+                if model_server == "triton":
+                    idx_model_per_instance=idx_model_per_instance+1
                 pred_replace = pred_replace.replace('[MODEL_IDX]', str(idx_model_per_instance))
             if args.cache_dns:
                 hostip = dns_cache[idx_instance]
@@ -129,7 +146,10 @@ if __name__ == '__main__':
                     port = f":{urlparts.port}"
                 pred_replace = f"{urlparts.scheme}://{hostip}{port}{urlparts.path}"
             if args.post:
-                result = session.post(pred_replace, data=feed_data)
+                if model_server == "triton":
+                    result = session.post(pred_replace, headers=headers, data=json.dumps(feed_data))
+                else:
+                    result = session.post(pred_replace, data=feed_data)
             else:
                 result = session.get(pred_replace)
             latency = time.time() - start
@@ -200,4 +220,4 @@ if __name__ == '__main__':
         executor.submit(current_performance)
         for _ in range(args.num_thread):
             executor.submit(one_thread, args.url, data)
-            # executor.submit(one_thread, args.url)
+

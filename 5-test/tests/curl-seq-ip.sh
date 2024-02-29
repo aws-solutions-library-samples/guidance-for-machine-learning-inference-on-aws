@@ -27,7 +27,9 @@ models=$num_models
 
 # get server ip addresses
 rm -f  ./endpoint_ip.conf
+echo ""
 echo "runtime=$runtime"
+echo "Sending sequential requests to $servers servers with $models models each ..."
 while [ $server -lt $servers ]
 do
 	if [ "$runtime" == "docker" ]; then
@@ -50,8 +52,17 @@ for endpoint_ip in $(cat ./endpoint_ip.conf)
 do
 	while [ $model -lt $models ] 
 	do
-		echo "Request: $request, Server: $server, IP: $endpoint_ip, Model: $model"
-		./clock.sh curl http://${endpoint_ip}:8080/predictions/model$model
+	    if [ "${model_server}" == "fastapi" ]; then
+		    fastapi_model_name=model${model}
+		    echo "Request: $request, Server: $server, IP: $endpoint_ip, Model: $fastapi_model_name"
+		    ./clock.sh ./fastapi-infer.sh ${endpoint_ip} ${fastapi_model_name}
+		elif [ "${model_server}" == "triton" ]; then
+		    triton_model_name=${huggingface_model_name}-$((model+1))
+		    echo "Request: $request, Server: $server, IP: $endpoint_ip, Model: $triton_model_name"
+		    ./clock.sh ./triton-infer.sh ${endpoint_ip} ${triton_model_name}
+		else
+		    echo "Unrecognized model server: ${model_server}"
+		fi
 		model=$((model+1))
 		request=$((request+1))
 		sleep $request_frequency

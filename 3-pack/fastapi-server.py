@@ -146,6 +146,11 @@ for i in range(num_models):
     logger.warning(f"   {model_id} ...")
     tokenizers[model_id]=tokenizer_class.from_pretrained(model_name)
     models[model_id] = torch.jit.load(model_path)
+    torch.jit.fuser('off')
+    torch._C._jit_override_can_fuse_on_cpu(False)
+    torch._C._jit_override_can_fuse_on_gpu(False)
+    torch._C._jit_set_texpr_fuser_enabled(False)
+    torch._C._jit_set_nvfuser_enabled(False)
     if device_type=='gpu':
         model=models[model_id]
         model.to(device)

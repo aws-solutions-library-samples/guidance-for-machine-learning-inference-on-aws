@@ -1,0 +1,38 @@
+ARG BASE_IMAGE=nvcr.io/nvidia/tritonserver:24.01-py3
+
+FROM $BASE_IMAGE
+
+ARG MODEL_NAME
+ARG MODEL_FILE_NAME
+ARG PROCESSOR
+ARG NUM_MODELS=1
+
+LABEL description="Model $MODEL_NAME packed in a Triton Server container to run on $PROCESSOR"
+
+RUN apt update && apt install -y gettext
+
+RUN for i in $(seq $NUM_MODELS); do mkdir -p /app/server/models/${MODEL_NAME}-${i}/1; done
+
+COPY  ./3-pack/triton-handler.py /app/server/models/triton-handler.py
+
+RUN for i in $(seq $NUM_MODELS); do export TRITON_MODEL_NAME=${MODEL_NAME}-${i}; cp /app/server/models/triton-handler.py /app/server/models/${TRITON_MODEL_NAME}/1/model.py; done
+
+COPY ./3-pack/triton-config.pbtxt /app/server/models/triton-config.pbtxt
+
+RUN for i in $(seq $NUM_MODELS); do export TRITON_MODEL_NAME=${MODEL_NAME}-${i}; cat /app/server/models/triton-config.pbtxt | envsubst | tee /app/server/models/${TRITON_MODEL_NAME}/config.pbtxt; done
+
+COPY ./3-pack/triton-run.sh /app/server/run.sh
+
+COPY ./3-pack/triton-requirements.txt /app/server/requirements.txt
+
+COPY ./2-trace/traced-${MODEL_NAME}/${MODEL_FILE_NAME} /app/server/models/
+
+RUN pip install -r /app/server/requirements.txt
+
+COPY ./config.properties /app/config.properties
+
+WORKDIR /app/server
+
+EXPOSE 8000
+
+CMD ["./run.sh"]

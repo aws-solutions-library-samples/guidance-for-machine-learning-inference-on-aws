@@ -26,7 +26,9 @@ models=$num_models
 
 # get instance ip addresses
 rm -f  ./endpoint_ip.conf
+echo ""
 echo "runtime=$runtime"
+echo "Sending random requests to $servers servers with $models models each ..."
 while [ $server -lt $servers ]
 do
 	if [ "$runtime" == "docker" ]; then
@@ -51,8 +53,17 @@ do
 	server=$(shuf -i 0-${server_last_index} -n 1)
 	server_ip=${server_ips[$server]}
 	model=$(shuf -i 0-${model_last_index} -n 1)
-	echo "Request: $request, Server: $server, IP: $server_ip,  Model: $model"
-	./clock.sh curl http://$server_ip:8080/predictions/model$model
+    if [ "${model_server}" == "fastapi" ]; then
+        fastapi_model_name=model${model}
+		echo "Request: $request, Server: $server, IP: $server_ip,  Model: $fastapi_model_name"
+		./clock.sh ./fastapi-infer.sh ${server_ip} ${fastapi_model_name}
+	elif [ "${model_server}" == "triton" ]; then
+	    triton_model_name=${huggingface_model_name}-$((model+1))
+		echo "Request: $request, Server: $server, IP: $server_ip,  Model: $triton_model_name"
+		./clock.sh ./triton-infer.sh ${server_ip} ${triton_model_name}
+	else
+		echo "Unrecognized model server: ${model_server}"
+	fi
 	sleep $request_frequency
 	request=$((request+1))
 done
