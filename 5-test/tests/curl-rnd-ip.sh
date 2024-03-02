@@ -60,7 +60,7 @@ do
 	elif [ "${model_server}" == "triton" ]; then
 	    triton_model_name=${huggingface_model_name}-$((model+1))
 		echo "Request: $request, Server: $server, IP: $server_ip,  Model: $triton_model_name"
-		./clock.sh ./triton-infer.sh ${server_ip} ${triton_model_name}
+		./clock.sh ./triton-infer.sh ${server_ip} ${triton_model_name} ${service_port}
 	else
 		echo "Unrecognized model server: ${model_server}"
 	fi

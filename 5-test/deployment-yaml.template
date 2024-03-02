@@ -38,6 +38,12 @@ spec:
           value: "$num_requests"
         - name: request_frequency
           value: "$request_frequency"
+        - name: model_server
+          value: "$model_server"
+        - name: service_port
+          value: "$service_port"
+        - name: huggingface_model_name
+          value: "$huggingface_model_name"
         resources:
           limits:
             cpu: 1

@@ -47,7 +47,7 @@ spec:
             value: "${quiet}"
         ports:
         - name: pod-port
-          containerPort: 8080
+          containerPort: ${model_server_port}
         resources:
           limits:
             nvidia.com/gpu: 1
