@@ -10,7 +10,7 @@ source ./config.properties
 
 print_help() {
 	echo ""
-	echo "Usage: $0 [arg]"
+	echo "Usage: $0 <arg>"
 	echo ""
 	echo "   When no arguments are specified, this script runs the demo loop "
 	echo "   ./deploy.sh run &&./test.sh run bmk && ./test.sh run bma && ./test.sh stop && ./deploy.sh stop "
@@ -27,17 +27,16 @@ print_help() {
 }
 
 
-action=$1
-
-if [ "$action" == "" ]
-then
-    action="run"
-fi
-
 LOG=/tmp/inference-demo.log
 METRICS=/tmp/inference-metrics.log
 
 run() {
+    status=$(ps -aef | grep -v grep | grep demo | grep run | wc -l)
+    if [ $status -gt 2 ]; then
+	echo ""
+	echo "A demo is already running."
+        echo "Please run './demo.sh stop' first, then try again."
+    else
 	echo "" >> $LOG
 	echo "Starting demo loop ..." >> $LOG
 
@@ -61,11 +60,11 @@ run() {
 		sleep 10
 		./test.sh run bmk >> $LOG
 		sleep 10
-		cnt_in_progress_bmk=$(./test.sh status | grep test | grep -v Completed | wc -l)
+		cnt_in_progress_bmk=$(./test.sh status | grep test | grep -v Completed | grep -v Error | wc -l)
 		echo "In-progress benchmark tests: $cnt_in_progress_bmk" >> $LOG
 		while [ $cnt_in_progress_bmk -gt 0 ]; do
 			sleep 30
-			cnt_in_progress_bmk=$(./test.sh status | grep test | grep -v Completed | wc -l)
+			cnt_in_progress_bmk=$(./test.sh status | grep test | grep -v Completed | grep -v Error | wc -l)
 			echo "In-progress benchmark tests: $cnt_in_progress_bmk" >> $LOG
 		done
 		./deploy.sh stop >> $LOG
@@ -91,10 +90,11 @@ run() {
 		sleep 60
 		echo "Done cooling off" >> $LOG
 	done
+    fi
 }
 
 status() {
-	ps -aef | grep -v grep | grep -v status | grep demo
+	ps -aef | grep demo | grep run
 }
 
 logs() {
@@ -114,35 +114,42 @@ stop() {
 	pkill -e demo.sh
 }
 
-echo ""
-case "$action" in
-    "run")
-	echo "Running demo ..."
-        run
-        ;;
-    "stop")
-	echo "Stopping demo ..."
-        stop
-        ;;
-    "status")
-	echo "Showing demo status ..."
-        status
-        ;;
-    "logs")
-	echo "Showing demo logs ..."
-        logs
-        ;;
-    "metrics")
-	echo "Showing demo metrics ..."
-        metrics
-        ;;
-    "clear")
-	echo "Clearing historical demo logs and metrics ..."
-        clear
-        ;;
-    *)
-	echo "Showing demo help ..."
-	print_help
-        ;;
-esac
-echo ""
+action=$1
+
+if [ "$action" == "" ]
+then
+    print_help
+else
+    echo ""
+    case "$action" in
+        "run")
+	    #echo "Running demo ..."
+            run
+            ;;
+        "stop")
+	    echo "Stopping demo ..."
+            stop
+            ;;
+        "status")
+	    echo "Showing demo status ..."
+            status
+            ;;
+        "logs")
+	    echo "Showing demo logs ..."
+            logs
+            ;;
+        "metrics")
+	    echo "Showing demo metrics ..."
+            metrics
+            ;;
+        "clear")
+	    echo "Clearing historical demo logs and metrics ..."
+            clear
+            ;;
+        *)
+	    echo "Showing demo help ..."
+	    print_help
+            ;;
+    esac
+    echo ""
+fi
