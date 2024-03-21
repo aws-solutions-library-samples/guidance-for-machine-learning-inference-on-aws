@@ -5,27 +5,26 @@
 # SPDX-License-Identifier: MIT-0                                     #
 ######################################################################
 
-if [ "$num_servers" == "" ]; then
+echo "Configuring number of model servers from config.properties ..."
 
-    echo "Configuring number of model servers from config.properties ..."
-
-    if [ -f ../config.properties ]; then
-        source ../config.properties
-    elif [ -f ../../config.properties ]; then
-        source ../../config.properties
-    elif [ -f ./config.properties ]; then
-        source ./config.properties
-    else
-        echo "config.properties not found!"
-    fi
+if [ -f ../config.properties ]; then
+    source ../config.properties
+elif [ -f ../../config.properties ]; then
+    source ../../config.properties
+elif [ -f ./config.properties ]; then
+    source ./config.properties
 else
-    echo "Number of model servers ($num_servers) configured from environment ..."
+    echo "config.properties not found!"
 fi
 
+    echo "Number of model servers ($num_servers) configured from environment ..."
+
+
+
 if [ "$runtime" == "docker" ]; then
-    python benchmark_client.py --num_thread 2 --url http://${app_name}-[INSTANCE_IDX]:8080/predictions/model[MODEL_IDX] --is_multi_instance --n_instance ${num_servers} --is_multi_model_per_instance --n_model_per_instance ${num_models} --latency_window_size 1000 --cache_dns 
+    python benchmark_client.py --num_thread 2 --url http://${app_name}-[INSTANCE_IDX]:8080/predictions/model[MODEL_IDX] --is_multi_instance --n_instance ${num_servers} --is_multi_model_per_instance --n_model_per_instance ${num_models} --latency_window_size 1000 --cache_dns --model_server ${model_server}
 elif [ "$runtime" == "kubernetes" ]; then 
-    python benchmark_client.py --num_thread 2 --url http://${app_name}-[INSTANCE_IDX].${namespace}.svc.cluster.local:8080/predictions/model[MODEL_IDX] --is_multi_instance --n_instance ${num_servers} --is_multi_model_per_instance --n_model_per_instance ${num_models} --latency_window_size 1000 --cache_dns 
+    python benchmark_client.py --num_thread 2 --url http://${app_name}-[INSTANCE_IDX].${namespace}.svc.cluster.local:8080/predictions/model[MODEL_IDX] --is_multi_instance --n_instance ${num_servers} --is_multi_model_per_instance --n_model_per_instance ${num_models} --latency_window_size 1000 --cache_dns --model_server ${model_server}
 else
     echo "Runtime $runtime not recognized"
 fi
