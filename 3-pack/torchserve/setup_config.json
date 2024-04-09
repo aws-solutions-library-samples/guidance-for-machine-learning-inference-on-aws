@@ -1,0 +1,7 @@
+{
+ "model_name":"bert-base-multilingual-cased",
+ "mode":"question_answering",
+ "do_lower_case":true,
+ "save_mode":"pretrained",
+ "max_length":"128"
+}

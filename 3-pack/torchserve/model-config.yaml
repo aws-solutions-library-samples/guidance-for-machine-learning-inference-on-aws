@@ -1,0 +1,6 @@
+minWorkers: 1
+maxWorkers: 1
+batchSize: 1
+responseTimeout: 240
+handler:
+  model_dir: "Transformer_model"
