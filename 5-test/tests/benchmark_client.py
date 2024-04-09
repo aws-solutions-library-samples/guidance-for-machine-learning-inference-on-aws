@@ -53,11 +53,9 @@ if __name__ == '__main__':
     if is_multi_model_per_instance:
         n_model_per_instance = args.n_model_per_instance
 
-    if args.model_server == "fastapi":
-        data = {"seq_0": "how many chapters the book has?",
-                "seq_1": """The number 42 is, in The Hitchhiker's Guide to the Galaxy by Douglas Adams."""}
-    elif args.model_server == "torchserve":
-        data = "Bloomberg has decided to publish a new report on global economic situation."
+    data = {"seq_0": "how many chapters the book has?",
+            "seq_1": """The number 42 is, in The Hitchhiker's Guide to the Galaxy by Douglas Adams."""}
+    if args.model_server == "torchserve":
         args.post = True
     live = True
     num_infer = 0

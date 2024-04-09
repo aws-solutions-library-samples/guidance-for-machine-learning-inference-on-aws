@@ -29,7 +29,7 @@ if [ "$action" == "" ]; then
 
 	if [ "$model_server" == "torchserve" ]
 	then
-  	BASE_IMAGE=pytorch/torchserve:latest-cpu
+  	BASE_IMAGE=pytorch/torchserve:latest-${processor}
 	MODEL_SERVER=torchserve
 	fi
 

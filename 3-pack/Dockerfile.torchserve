@@ -1,5 +1,4 @@
 ARG BASE_IMAGE
-
 FROM $BASE_IMAGE
 
 ARG MODEL_NAME
@@ -9,12 +8,14 @@ ARG PROCESSOR
 
 LABEL description="Model $MODEL_NAME packed in a TorchServe container to run on $PROCESSOR" 
 
-RUN wget https://torchserve.pytorch.org/mar_files/bert_seqc_without_torchscript.mar -O /home/model-server/model-store/BERTSC.mar
-
 WORKDIR /home/model-server
 
-ENTRYPOINT ["/usr/local/bin/dockerd-entrypoint.sh"]
+COPY 3-pack/torchserve torchserve 
 
-CMD ["serve"]
+WORKDIR /home/model-server/torchserve
+USER root
+COPY 3-pack/torchserve/dockerd-entrypoint.sh /usr/local/bin/dockerd-entrypoint.sh
 
-CMD ["torchserve", "--start", "--ts-config", "/home/model-server/config.properties", "--models", "model0=BERTSC.mar"]
+RUN chmod +x /usr/local/bin/dockerd-entrypoint.sh \
+    && chown -R model-server /home/model-server
+
