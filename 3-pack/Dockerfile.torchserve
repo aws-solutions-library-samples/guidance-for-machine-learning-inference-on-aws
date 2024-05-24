@@ -1,0 +1,21 @@
+ARG BASE_IMAGE
+FROM $BASE_IMAGE
+
+ARG MODEL_NAME
+ARG MODEL_FILE_NAME
+ARG PROCESSOR
+
+
+LABEL description="Model $MODEL_NAME packed in a TorchServe container to run on $PROCESSOR" 
+
+WORKDIR /home/model-server
+
+COPY 3-pack/torchserve torchserve 
+
+WORKDIR /home/model-server/torchserve
+USER root
+COPY 3-pack/torchserve/dockerd-entrypoint.sh /usr/local/bin/dockerd-entrypoint.sh
+
+RUN chmod +x /usr/local/bin/dockerd-entrypoint.sh \
+    && chown -R model-server /home/model-server
+

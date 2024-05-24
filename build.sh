@@ -5,6 +5,9 @@
 # SPDX-License-Identifier: MIT-0                                     #
 ######################################################################
 
+BASE_IMAGE=python:3.9
+MODEL_SERVER=fastapi
+
 print_help() {
 	echo ""
 	echo "Usage: $0 [arg]"
@@ -24,14 +27,20 @@ action=$1
 if [ "$action" == "" ]; then
 	source ./config.properties
 
+	if [ "$model_server" == "torchserve" ]
+	then
+  	BASE_IMAGE=pytorch/torchserve:latest-${processor}
+	MODEL_SERVER=torchserve
+	fi
+
 	echo ""
-	echo "Building base container ..."
+	echo "Building base container ... "
 	
 	echo ""
 	dockerfile=./1-build/Dockerfile-base-${processor}
 	if [ -f $dockerfile ]; then
-		echo "    ... base-${processor} ..."
-		docker build -t ${registry}${base_image_name}${base_image_tag} -f $dockerfile .
+		echo "    ... base-${processor} ... "
+		docker build --build-arg BASE_IMAGE="${BASE_IMAGE}" --build-arg MODEL_SERVER="${MODEL_SERVER}" -t ${registry}${base_image_name}${base_image_tag} -f $dockerfile .
 	else
 		echo "Dockerfile $dockerfile was not found."
 	        echo "Please ensure that processor is configured with a supported value in config.properties"
