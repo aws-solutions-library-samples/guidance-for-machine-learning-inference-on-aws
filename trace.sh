@@ -26,8 +26,7 @@ if [ "$1" == "" ]; then
 	if [ -f $dockerfile ]; then
 		echo "   ... for processor: $processor ..."
 		trace_opts=trace_opts_${processor}
-                # docker run ${!trace_opts} -it --rm -v $(pwd)/2-trace:/app/trace -v $(pwd)/config.properties:/app/config.properties ${registry}${base_image_name}${base_image_tag} bash -c "cd /app/trace; python model-tracer.py"
-                # move commands into special variables forease of maintenance:
+                # move commands into special variables for ease of maintenance:
                 CMD="docker run ${!trace_opts} -it --rm -v $(pwd)/2-trace:/app/trace -v $(pwd)/config.properties:/app/config.properties ${registry}${base_image_name}${base_image_tag} bash -c 'cd /app/trace; python --version; python model-tracer.py'"
                 echo "will run command: "
                 echo "$CMD"
