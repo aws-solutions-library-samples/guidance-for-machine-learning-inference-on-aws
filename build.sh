@@ -32,7 +32,7 @@ if [ "$action" == "" ]; then
 	if [ -f $dockerfile ]; then
 		echo "    ... base-${processor} ..."
 		# docker build -t ${registry}${base_image_name}${base_image_tag} -f $dockerfile .
-                # refactor docker build command into designated variable for ease of debuggging and changes
+                # refactor docker build command into designated variable for ease of debugging and changes
                 CMD="docker build -t ${registry}${base_image_name}${base_image_tag} -f $dockerfile ."
                 echo "will run command: "
                 echo "$CMD"
