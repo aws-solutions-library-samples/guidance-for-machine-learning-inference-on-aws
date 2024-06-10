@@ -27,9 +27,16 @@ action=$1
 if [ "$action" == "" ]; then
     model_file_name=${huggingface_model_name}_bs${batch_size}_seq${sequence_length}_pc${pipeline_cores}_${processor}.pt
     
-    docker build -t ${registry}${model_image_name}${model_image_tag} --build-arg BASE_IMAGE=${registry}${base_image_name}${base_image_tag} \
+    # docker build -t ${registry}${model_image_name}${model_image_tag} --build-arg BASE_IMAGE=${registry}${base_image_name}${base_image_tag} \
+    #             --build-arg MODEL_NAME=${huggingface_model_name} --build-arg MODEL_FILE_NAME=${model_file_name} --build-arg PROCESSOR=${processor} \
+    #             -f 3-pack/Dockerfile .
+    # move commands into special variables for ease of maintenance:
+    CMD="docker build -t ${registry}${model_image_name}${model_image_tag} --build-arg BASE_IMAGE=${registry}${base_image_name}${base_image_tag} \
                  --build-arg MODEL_NAME=${huggingface_model_name} --build-arg MODEL_FILE_NAME=${model_file_name} --build-arg PROCESSOR=${processor} \
-                 -f 3-pack/Dockerfile .
+                 -f 3-pack/Dockerfile ."
+    echo "will run command: "
+    echo "$CMD"
+    eval "$CMD"
 elif [ "$action" == "push" ]; then
     ./3-pack/push.sh
 elif [ "$action" == "pull" ]; then
