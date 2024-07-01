@@ -22,8 +22,10 @@ if [ "$runtime" == "docker" ]; then
     test_container=0
         while [ $test_container -lt $num_test_containers ]; do
             CMD="docker rm -f ${test_image_name}-${test_container}"
-            echo "$CMD"
-            eval "$CMD"
+            if [ ! "$verbose" == "false" ]; then
+                echo "\n${CMD}\n"
+            fi
+            eval "${CMD}"
             test_container=$((test_container+1))
         done
     else
@@ -33,7 +35,11 @@ if [ "$runtime" == "docker" ]; then
     fi
 elif [ "$runtime" == "kubernetes" ]; then
     pushd ./5-test > /dev/null
-    kubectl delete -f ${test_dir}
+    CMD="kubectl delete -f ${test_dir}"
+    if [ ! "$verbose" == "false" ]; then
+        echo "\n${CMD}\n"
+    fi
+    eval "${CMD}"
     popd > /dev/null
 else
     echo "Runtime $runtime not recognized"

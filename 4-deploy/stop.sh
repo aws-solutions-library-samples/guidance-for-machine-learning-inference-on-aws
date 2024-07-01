@@ -21,12 +21,19 @@ if [ "$runtime" == "docker" ]; then
     server=0
     while [ $server -lt $num_servers ]; do
         CMD="docker rm -f ${app_name}-${server}"
-        echo "$CMD"
-        eval "$CMD"
+        if [ ! "$verbose" == "false" ]; then
+            echo "\n${CMD}\n"
+        fi
+        eval "${CMD}"
 	server=$((server+1))
     done
 elif [ "$runtime" == "kubernetes" ]; then
-    kubectl delete -f ${app_dir} 
+    CMD="kubectl delete -f ${app_dir}"
+    if [ ! "$verbose" == "false" ]; then
+        echo "\n${CMD}\n"
+    fi
+    eval "${CMD}"
 else
     echo "Runtime $runtime not recognized"
 fi
+

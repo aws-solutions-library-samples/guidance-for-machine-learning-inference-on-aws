@@ -15,4 +15,9 @@ else
     echo "config.properties not found!"
 fi
 
-docker pull ${registry}${base_image_name}${base_image_tag}
+CMD="docker pull ${registry}${base_image_name}${base_image_tag}"
+if [ ! "$verbose" == "false" ]; then
+        echo "\n${CMD}\n"
+fi
+eval "${CMD}"
+

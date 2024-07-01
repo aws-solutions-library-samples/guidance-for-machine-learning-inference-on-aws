@@ -26,8 +26,10 @@ if [ "$runtime" == "docker" ]; then
             echo "bc not found"
             echo "Please 'sudo apt-get install -y bc' or 'sudo yum install -y bc', then try again"
         else
-            echo "$CMD"
-            eval "$CMD"
+            if [ ! "$verbose" == "false" ]; then
+                echo "\n${CMD}\n"
+            fi
+            eval "${CMD}"
             ./aggregate.sh ./bmk-all.log
         fi
         rm -f ./bmk-all.log
@@ -49,9 +51,11 @@ if [ "$runtime" == "docker" ]; then
                 CMD="$CMD bash -c 'pushd /app/tests && ./curl-rnd-ip.sh'"
             elif [ "$1" == "bmk" ]; then
                 CMD="$CMD bash -c 'pushd /app/tests && ./benchmark.sh'"
-             fi
-            echo "$CMD"
-            eval "$CMD"
+            fi
+            if [ ! "$verbose" == "false" ]; then
+                echo "\n${CMD}\n"
+            fi
+            eval "${CMD}"
             test_container=$((test_container+1))
         done
     fi
@@ -64,13 +68,19 @@ elif [ "$runtime" == "kubernetes" ]; then
             echo "bc not found"
             echo "Please 'sudo apt-get install -y bc' or 'sudo yum install -y bc', then try again"
         else
-            echo "$CMD"
-            eval "$CMD"
+            if [ ! "$verbose" == "false" ]; then
+                echo "\n${CMD}\n"
+            fi
+            eval "${CMD}"
             ./aggregate.sh ./bmk-all.log
         fi
         rm -f ./bmk-all.log
     else
-        kubectl create namespace ${test_namespace} --dry-run=client -o yaml | kubectl apply -f -
+        CMD="kubectl create namespace ${test_namespace} --dry-run=client -o yaml | kubectl apply -f -"
+        if [ ! "$verbose" == "false" ]; then
+            echo "\n${CMD}\n"
+        fi
+        eval "${CMD}"
         cmd_pod="while true; do date; sleep 10; done"
         template="./deployment-yaml.template"
         if [ "$1" == "seq" ]; then
@@ -86,7 +96,11 @@ elif [ "$runtime" == "kubernetes" ]; then
         echo "export cmd_pod=\"$cmd_pod\"" > cmd_pod.properties
         echo "export template=$template" >> cmd_pod.properties
         eval "./generate-yaml.sh"
-        kubectl apply -f ${test_dir}
+        CMD="kubectl apply -f ${test_dir}"
+        if [ ! "$verbose" == "false" ]; then
+            echo "\n${CMD}\n"
+        fi
+        eval "${CMD}"
     fi
     popd > /dev/null
 else

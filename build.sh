@@ -31,12 +31,11 @@ if [ "$action" == "" ]; then
 	dockerfile=./1-build/Dockerfile-base-${processor}
 	if [ -f $dockerfile ]; then
 		echo "    ... base-${processor} ..."
-		# docker build -t ${registry}${base_image_name}${base_image_tag} -f $dockerfile .
-                # refactor docker build command into designated variable for ease of debugging and changes
                 CMD="docker build -t ${registry}${base_image_name}${base_image_tag} -f $dockerfile ."
-                echo "will run command: "
-                echo "$CMD"
-                eval "$CMD"
+        	if [ ! "$verbose" == "false" ]; then
+                	echo "\n${CMD}\n"
+        	fi
+        	eval "${CMD}"
 	else
 		echo "Dockerfile $dockerfile was not found."
 	        echo "Please ensure that processor is configured with a supported value in config.properties"
