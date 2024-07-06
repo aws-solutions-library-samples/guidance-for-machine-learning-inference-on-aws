@@ -20,13 +20,13 @@ echo "Processor: $processor"
 if [ "$runtime" == "docker" ]; then
     CMD="docker exec -it ${app_name}-0 bash"
     if [ ! "$verbose" == "false" ]; then
-        echo "\n${CMD}\n"
+        echo -e "\n${CMD}\n"
     fi
     eval "${CMD}"
 elif [ "$runtime" == "kubernetes" ]; then
     CMD="kubectl -n ${namespace} exec -it $(kubectl -n ${namespace} get pod | grep ${app_name}-$1 | cut -d ' ' -f 1) -- bash"
     if [ ! "$verbose" == "false" ]; then
-        echo "\n${CMD}\n"
+        echo -e "\n${CMD}\n"
     fi
     eval "${CMD}"
 else

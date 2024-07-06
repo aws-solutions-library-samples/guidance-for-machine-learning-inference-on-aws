@@ -22,14 +22,14 @@ REGISTRY_COUNT=$(aws ecr describe-repositories | grep ${IMAGE} | wc -l)
 if [ "$REGISTRY_COUNT" == "0" ]; then
     CMD="aws ecr create-repository --repository-name ${IMAGE} --region ${region}"
     if [ ! "$verbose" == "false" ]; then
-        echo "\n${CMD}\n"
+        echo -e "\n${CMD}\n"
     fi
     eval "${CMD}"
 fi
 
 CMD="docker push ${registry}${base_image_name}${base_image_tag}"
 if [ ! "$verbose" == "false" ]; then
-    echo "\n${CMD}\n"
+    echo -e "\n${CMD}\n"
 fi
 eval "${CMD}"
 

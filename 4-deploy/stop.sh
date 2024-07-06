@@ -22,7 +22,7 @@ if [ "$runtime" == "docker" ]; then
     while [ $server -lt $num_servers ]; do
         CMD="docker rm -f ${app_name}-${server}"
         if [ ! "$verbose" == "false" ]; then
-            echo "\n${CMD}\n"
+            echo -e "\n${CMD}\n"
         fi
         eval "${CMD}"
 	server=$((server+1))
@@ -30,7 +30,7 @@ if [ "$runtime" == "docker" ]; then
 elif [ "$runtime" == "kubernetes" ]; then
     CMD="kubectl delete -f ${app_dir}"
     if [ ! "$verbose" == "false" ]; then
-        echo "\n${CMD}\n"
+        echo -e "\n${CMD}\n"
     fi
     eval "${CMD}"
 else

@@ -18,7 +18,7 @@ print_help() {
 if [ "$1" == "" ]; then
 	CMD="vi ./config.properties"
 	if [ ! "$verbose" == "false" ]; then
-		echo "\n${CMD}\n"
+		echo -e "\n${CMD}\n"
 	fi
 	eval "${CMD}"
 else

@@ -17,7 +17,7 @@ fi
 
 CMD="docker pull ${registry}${base_image_name}${base_image_tag}"
 if [ ! "$verbose" == "false" ]; then
-        echo "\n${CMD}\n"
+        echo -e "\n${CMD}\n"
 fi
 eval "${CMD}"
 

@@ -31,7 +31,7 @@ if [ "$action" == "" ]; then
                  --build-arg MODEL_NAME=${huggingface_model_name} --build-arg MODEL_FILE_NAME=${model_file_name} --build-arg PROCESSOR=${processor} \
                  -f 3-pack/Dockerfile ."
     if [ ! "$verbose" == "false" ]; then
-        echo "\n${CMD}\n"
+        echo -e "\n${CMD}\n"
     fi
     eval "${CMD}"
 elif [ "$action" == "push" ]; then

@@ -33,7 +33,7 @@ if [ "$action" == "" ]; then
 		echo "    ... base-${processor} ..."
                 CMD="docker build -t ${registry}${base_image_name}${base_image_tag} -f $dockerfile ."
         	if [ ! "$verbose" == "false" ]; then
-                	echo "\n${CMD}\n"
+                	echo -e "\n${CMD}\n"
         	fi
         	eval "${CMD}"
 	else

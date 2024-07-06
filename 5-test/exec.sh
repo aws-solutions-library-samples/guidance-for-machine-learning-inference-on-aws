@@ -43,7 +43,7 @@ else
     echo "Runtime $runtime not recognized"
 fi
 if [ ! "$verbose" == "false" ]; then
-    echo "\n${CMD}\n"
+    echo -e "\n${CMD}\n"
 fi
 eval "${CMD}"
 
