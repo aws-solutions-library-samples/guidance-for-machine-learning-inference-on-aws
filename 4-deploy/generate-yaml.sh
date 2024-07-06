@@ -32,7 +32,7 @@ do
 	echo "Generating ./${app_dir}/${instance_name}.yaml ..."
 	CMD="cat $template | envsubst > ./${app_dir}/${instance_name}.yaml"
         if [ ! "$verbose" == "false" ]; then
-            echo "\n${CMD}\n"
+            echo -e "\n${CMD}\n"
         fi
         eval "${CMD}"
 	instance=$((instance+1))

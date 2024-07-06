@@ -27,7 +27,7 @@ if [ "$runtime" == "docker" ]; then
             echo "Please 'sudo apt-get install -y bc' or 'sudo yum install -y bc', then try again"
         else
             if [ ! "$verbose" == "false" ]; then
-                echo "\n${CMD}\n"
+                echo -e "\n${CMD}\n"
             fi
             eval "${CMD}"
             ./aggregate.sh ./bmk-all.log
@@ -53,7 +53,7 @@ if [ "$runtime" == "docker" ]; then
                 CMD="$CMD bash -c 'pushd /app/tests && ./benchmark.sh'"
             fi
             if [ ! "$verbose" == "false" ]; then
-                echo "\n${CMD}\n"
+                echo -e "\n${CMD}\n"
             fi
             eval "${CMD}"
             test_container=$((test_container+1))
@@ -69,7 +69,7 @@ elif [ "$runtime" == "kubernetes" ]; then
             echo "Please 'sudo apt-get install -y bc' or 'sudo yum install -y bc', then try again"
         else
             if [ ! "$verbose" == "false" ]; then
-                echo "\n${CMD}\n"
+                echo -e "\n${CMD}\n"
             fi
             eval "${CMD}"
             ./aggregate.sh ./bmk-all.log
@@ -78,7 +78,7 @@ elif [ "$runtime" == "kubernetes" ]; then
     else
         CMD="kubectl create namespace ${test_namespace} --dry-run=client -o yaml | kubectl apply -f -"
         if [ ! "$verbose" == "false" ]; then
-            echo "\n${CMD}\n"
+            echo -e "\n${CMD}\n"
         fi
         eval "${CMD}"
         cmd_pod="while true; do date; sleep 10; done"
@@ -98,7 +98,7 @@ elif [ "$runtime" == "kubernetes" ]; then
         eval "./generate-yaml.sh"
         CMD="kubectl apply -f ${test_dir}"
         if [ ! "$verbose" == "false" ]; then
-            echo "\n${CMD}\n"
+            echo -e "\n${CMD}\n"
         fi
         eval "${CMD}"
     fi

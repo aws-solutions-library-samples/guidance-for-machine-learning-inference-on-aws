@@ -28,7 +28,7 @@ if [ "$1" == "" ]; then
 		trace_opts=trace_opts_${processor}
                 CMD="docker run ${!trace_opts} -it --rm -v $(pwd)/2-trace:/app/trace -v $(pwd)/config.properties:/app/config.properties ${registry}${base_image_name}${base_image_tag} bash -c 'cd /app/trace; python --version; python model-tracer.py'"
 	        if [ ! "$verbose" == "false" ]; then
-                	echo "\n${CMD}\n"
+                	echo -e "\n${CMD}\n"
         	fi
         	eval "${CMD}"	
 	else

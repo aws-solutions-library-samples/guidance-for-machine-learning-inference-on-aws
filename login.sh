@@ -32,7 +32,7 @@ if [ "$1" == "" ]; then
         		echo "Logging in to $registry_type $registry ..."
         		CMD="aws ecr get-login-password --region $region | docker login --username AWS --password-stdin $registry"
         		if [ ! "$verbose" == "false" ]; then
-                		echo "\n${CMD}\n"
+                		echo -e "\n${CMD}\n"
         		fi
         		eval "${CMD}"
         		;;

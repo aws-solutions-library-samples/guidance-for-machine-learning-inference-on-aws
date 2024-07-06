@@ -29,7 +29,7 @@ if [ "$runtime" == "docker" ]; then
 	fi
     	CMD="docker run -d ${run_opts} ${registry}${model_image_name}${model_image_tag}"
         if [ ! "$verbose" == "false" ]; then
-            echo "\n${CMD}\n"
+            echo -e "\n${CMD}\n"
         fi
         eval "${CMD}"
 	server=$((server+1))
@@ -39,7 +39,7 @@ elif [ "$runtime" == "kubernetes" ]; then
     ./generate-yaml.sh
     CMD="kubectl apply -f ${app_dir}"
     if [ ! "$verbose" == "false" ]; then
-        echo "\n${CMD}\n"
+        echo -e "\n${CMD}\n"
     fi
     eval "${CMD}"
 else
