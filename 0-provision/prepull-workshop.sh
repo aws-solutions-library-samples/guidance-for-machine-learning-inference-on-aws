@@ -8,6 +8,10 @@ help () {
 }
 
 export ACTION=$1
+if [ "$ACTION" == "" ]; then
+	export ACTION=start
+fi
+
 if [ "$ACTION" == "help" ]; then
 	help
 elif [ "$ACTION" == "start" ]; then
