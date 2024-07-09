@@ -7,7 +7,7 @@ help () {
 	echo ""
 	echo "   ACTION    - start, describe, status, stop"
 	echo "   ENTITY    - model or test"
-	echo "   PROCESSOR - cpu, gpu, graviton, inf1, inf2"
+	echo "   PROCESSOR - cpu, gpu, graviton, inf"
 	echo ""
 }
 
