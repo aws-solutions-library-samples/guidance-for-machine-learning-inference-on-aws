@@ -1,4 +1,4 @@
-# Guidance for Low Latency, High Throughput Inference using Efficient Compute on Amazon EKS
+## Guidance for Low Latency, High Throughput Inference using Efficient Compute on Amazon EKS
 The [**guidance-for-machine-learning-inference-on-aws**](https://github.com/aws-solutions-library-samples/guidance-for-machine-learning-inference-on-aws) repository contains an end-to-end automation framework example for running model inference locally on Docker or at scale on Amazon EKS Kubernetes cluster. 
 It supports EKS compute nodes based on CPU, GPU, AWS Graviton and AWS Inferentia processor architectures  and can pack multiple models in a single processor core for improved cost efficiency.
 While this example focuses on one processor architecture at a time, iterating over the steps below for various CPU/GPU Efficient Compute and Inferentia architectures enables hybrid deployments where the best processor/accelerator is used to serve each model depending on its resource consumption profile.
