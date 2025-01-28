@@ -9,6 +9,8 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved. #
 # SPDX-License-Identifier: MIT-0                                     #
 ######################################################################
+# Project settings
+verbose=true
 
 # Model settings
 huggingface_model_name=bert-base-multilingual-cased
