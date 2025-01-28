@@ -13,7 +13,11 @@ else
     echo "config.properties not found!"
 fi
 
-
-docker build -t ${registry}${test_image_name}${test_image_tag} --build-arg BASE_IMAGE=${registry}${base_image_name}${base_image_tag} \
-             -f 5-test/Dockerfile .
-             
+#use CMD variable for better debugging
+CMD="docker build -t ${registry}${test_image_name}${test_image_tag} --build-arg BASE_IMAGE=${registry}${base_image_name}${base_image_tag} \
+             -f 5-test/Dockerfile ."
+if [ ! "$verbose" == "false" ]; then
+    echo -e "\n${CMD}\n"
+fi
+eval "${CMD}"
+    

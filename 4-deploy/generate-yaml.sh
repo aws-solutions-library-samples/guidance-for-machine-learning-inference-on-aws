@@ -31,8 +31,10 @@ do
 	export instance_name=${prefix}${instance}
 	echo "Generating ./${app_dir}/${instance_name}.yaml ..."
 	CMD="cat $template | envsubst > ./${app_dir}/${instance_name}.yaml"
-	#echo "$CMD"
-	eval "$CMD"
+        if [ ! "$verbose" == "false" ]; then
+            echo -e "\n${CMD}\n"
+        fi
+        eval "${CMD}"
 	instance=$((instance+1))
 done
 

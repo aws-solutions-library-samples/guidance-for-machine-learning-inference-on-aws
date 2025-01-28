@@ -9,6 +9,8 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved. #
 # SPDX-License-Identifier: MIT-0                                     #
 ######################################################################
+# Project settings
+verbose=true
 
 # Model settings
 huggingface_model_name=bert-base-multilingual-cased
@@ -37,14 +39,14 @@ region=us-west-2
 # registry_type=ecr
 registry_type=ecr
 base_image_name=aws-do-inference-base
-base_image_tag=:v10-${processor}
+base_image_tag=:v15-${processor}
 #model_image_name=${huggingface_model_name}
-#model_image_tag=:v10-${processor}
+#model_image_tag=:v15-${processor}
 
 # if using pre-built public registry model image (may require authentication) use the following settings
 registry=public.ecr.aws/a2u7h5w3/
 model_image_name=bert-base-workshop
-model_image_tag=:v10-${processor}
+model_image_tag=:v15-${processor}
 
 # Trace settings
 # trace_opts_$processor is a processor-specific setting used by the docker run command in the trace.sh script
@@ -72,25 +74,25 @@ service_port=8080
 # A node group with the specified instance_type must exist in the cluster
 # The instance type must have the processor configured above
 # Example: processor=graviton, instance_type=c7g.4xlarge
-instance_type=inf2.2xlarge
+instance_type=inf2.xlarge
 # num_servers - number of model servers to deploy
 # note that more than one model server can run on a node with multiple cpu/gpu/inferentia chips.
 # example: 4 model servers fit on one inf1.6xlarge instance as it has 4 inferentia chips.
-num_servers=1
+num_servers=2
 # Kubernetes namespace
 namespace=mpi
 # Kubernetes app name
 app_name=${huggingface_model_name}-${processor}
 app_dir=app-${app_name}-${instance_type}
 
-# Test image settings
+# Local Test image settings
 #test_image_name=test-${huggingface_model_name}
-#test_image_tag=:v10-cpu
+#test_image_tag=:v15-cpu
 
-#when using pre-built test image available in public ECR registry (may require authentication): 
-
+# when using pre-built test image available in public ECR registry (may require authentication): 
+# public.ecr.aws/a2u7h5w3/bert-base-workshop:test-v15-cpu
 test_image_name=bert-base-workshop
-test_image_tag=:test-v10-cpu
+test_image_tag=:test-v15-cpu
 
 # request_frequency - time to sleep between two consecutive requests in curl tests
 request_frequency=0.01

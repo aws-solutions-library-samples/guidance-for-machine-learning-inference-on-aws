@@ -2,7 +2,7 @@
 
 # This file contains all customizable configuration items for the project
 # It is pre-configured for re:Invent 2023 builder session for the following basic settings:
-# using locally built and uploaded Model container images for Graviton and publicly shared Test container images
+# using publicly shared Model container images for Inferentia 2 and publicly shared Test container images
 # replace the original config.properties file with this version to run Tests on c5.4xlarge nodes
 
 ######################################################################
@@ -19,7 +19,7 @@ huggingface_model_class=BertForQuestionAnswering
 
 # Compiler settings
 # processor = cpu|gpu|inf1|inf2|graviton
-processor=graviton
+processor=gpu
 pipeline_cores=1
 sequence_length=128
 batch_size=1
@@ -40,10 +40,10 @@ region=us-west-2
 registry_type=ecr
 base_image_name=aws-do-inference-base
 base_image_tag=:v15-${processor}
-# model_image_name=${huggingface_model_name}
-# model_image_tag=:v15-${processor}
+#model_image_name=${huggingface_model_name}
+#model_image_tag=:v15-${processor}
 
-# if using pre-built public registry image (may require authentication) use the following settings
+# if using pre-built public registry model image (may require authentication) use the following settings
 registry=public.ecr.aws/a2u7h5w3/
 model_image_name=bert-base-workshop
 model_image_tag=:v15-${processor}
@@ -74,7 +74,7 @@ service_port=8080
 # A node group with the specified instance_type must exist in the cluster
 # The instance type must have the processor configured above
 # Example: processor=graviton, instance_type=c7g.4xlarge
-instance_type=c7g.4xlarge
+instance_type=g5.4xlarge
 # num_servers - number of model servers to deploy
 # note that more than one model server can run on a node with multiple cpu/gpu/inferentia chips.
 # example: 4 model servers fit on one inf1.6xlarge instance as it has 4 inferentia chips.
@@ -85,12 +85,12 @@ namespace=mpi
 app_name=${huggingface_model_name}-${processor}
 app_dir=app-${app_name}-${instance_type}
 
-# Test image settings
+# Local Test image settings
 #test_image_name=test-${huggingface_model_name}
 #test_image_tag=:v15-cpu
 
-#when using pre-built test image available in public ECR registry (may require authentication): 
-#registry=public.ecr.aws/a2u7h5w3/
+# when using pre-built test image available in public ECR registry (may require authentication): 
+# public.ecr.aws/a2u7h5w3/bert-base-workshop:test-v15-cpu
 test_image_name=bert-base-workshop
 test_image_tag=:test-v15-cpu
 

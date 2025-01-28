@@ -19,23 +19,41 @@ echo "Processor: $processor"
 
 if [ "$runtime" == "docker" ]; then
     CMD="docker ps -a | grep ${app_name}"
-    echo "$CMD"
-    eval "$CMD"
+    if [ ! "$verbose" == "false" ]; then
+        echo -e "\n${CMD}\n"
+    fi
+    eval "${CMD}"
 elif [ "$runtime" == "kubernetes" ]; then
     if [ "$1" == "" ]; then
+        CMD="kubectl -n ${namespace} get pods"
+        if [ ! "$verbose" == "false" ]; then
+            echo -e "\n${CMD}\n"
+        fi
         echo ""
         echo "Pods:"
-        kubectl -n ${namespace} get pods
+        eval "${CMD}"
+        CMD="kubectl -n ${namespace} get services"
+        if [ ! "$verbose" == "false" ]; then
+            echo -e "\n${CMD}\n"
+        fi
         echo ""
         echo "Services:"
-        kubectl -n ${namespace} get services
+        eval "${CMD}"
     else
+        CMD="kubectl -n ${namespace} get pod $(kubectl -n ${namespace} get pods | grep ${app_name}-$1 | cut -d ' ' -f 1) -o wide"
+        if [ ! "$verbose" == "false" ]; then
+            echo -e "\n${CMD}\n"
+        fi
         echo ""
         echo "Pod:"
-        kubectl -n ${namespace} get pod $(kubectl -n ${namespace} get pods | grep ${app_name}-$1 | cut -d ' ' -f 1) -o wide
+        eval "${CMD}"
+        CMD="kubectl -n ${namespace} get service ${app_name}-$1"
+        if [ ! "$verbose" == "false" ]; then
+            echo -e "\n${CMD}\n"
+        fi
         echo ""
         echo "Service:"
-        kubectl -n ${namespace} get service ${app_name}-$1
+        eval "${CMD}"
     fi
 else
     echo "Runtime $runtime not recognized"

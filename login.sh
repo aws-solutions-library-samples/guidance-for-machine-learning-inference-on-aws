@@ -30,7 +30,11 @@ if [ "$1" == "" ]; then
 	case "$registry_type" in
     		"ecr")
         		echo "Logging in to $registry_type $registry ..."
-        		aws ecr get-login-password --region $region | docker login --username AWS --password-stdin $registry
+        		CMD="aws ecr get-login-password --region $region | docker login --username AWS --password-stdin $registry"
+        		if [ ! "$verbose" == "false" ]; then
+                		echo -e "\n${CMD}\n"
+        		fi
+        		eval "${CMD}"
         		;;
     		*)
         		echo "Login for registry_type=$registry_type is not implemented"

@@ -30,7 +30,7 @@ if [ "$runtime" == "kubernetes" ]; then
 	
 	echo ""
 	pushd ./6-remove
-	./cfn-delete.sh
+	./stack-delete.sh
 	popd
 elif [ "$runtime" == "docker" ]; then
         echo ""

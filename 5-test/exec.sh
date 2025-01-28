@@ -28,8 +28,6 @@ if [ "$runtime" == "docker" ]; then
             CMD="docker exec -it ${test_image_name}-$1 bash"
         fi
     fi
-    echo "$CMD"
-    eval "$CMD"
 elif [ "$runtime" == "kubernetes" ]; then
     if [ "$num_test_containers" == "1" ]; then
         CMD="kubectl -n ${test_namespace} exec -it $(kubectl -n ${test_namespace} get pod | grep ${test_image_name}-0 | cut -d ' ' -f 1) -- bash"
@@ -41,8 +39,11 @@ elif [ "$runtime" == "kubernetes" ]; then
             CMD="kubectl -n ${test_namespace} exec -it $(kubectl -n ${test_namespace} get pod | grep ${test_image_name}-$1 | cut -d ' ' -f 1) -- bash"
         fi
     fi
-    echo "$CMD"
-    eval "$CMD"
 else
     echo "Runtime $runtime not recognized"
 fi
+if [ ! "$verbose" == "false" ]; then
+    echo -e "\n${CMD}\n"
+fi
+eval "${CMD}"
+

@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: prepull-${ENTITY}-${PROCESSOR}
+  namespace: kube-system
+  labels:
+    k8s-app: prepull-${ENTITY}-${PROCESSOR}
+spec:
+  selector:
+    matchLabels:
+      name: prepull-${ENTITY}-${PROCESSOR}
+  template:
+    metadata:
+      labels:
+        name: prepull-${ENTITY}-${PROCESSOR}
+    spec:
+      nodeSelector:
+        node.kubernetes.io/instance-type: ${INSTANCE_TYPE}
+      initContainers:
+      - name: prepull-${ENTITY}-${PROCESSOR}
+        # This is the image to pre-pull
+        image: ${REGISTRY}${IMAGE}${TAG}
+        command: ["/bin/sh"]
+        args: ["-c", "echo Image ${REGISTRY}${IMAGE}${TAG} pre-pulled"]
+      containers:
+      - name: pause
+        image: public.ecr.aws/eks-distro/kubernetes/pause:v1.29.5-eks-1-29-latest
+      terminationGracePeriodSeconds: 10

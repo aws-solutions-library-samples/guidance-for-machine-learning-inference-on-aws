@@ -17,6 +17,7 @@ echo ""
 echo "Runtime: $runtime"
 echo "Processor: $processor"
 
+CMD=""
 if [ "$runtime" == "docker" ]; then
     if [ "$num_servers" == "1" ]; then
         CMD="docker logs -f ${app_name}-0"
@@ -27,8 +28,6 @@ if [ "$runtime" == "docker" ]; then
             CMD="docker logs -f ${app_name}-$1"
         fi
     fi
-    echo "$CMD"
-    eval "$CMD"
 elif [ "$runtime" == "kubernetes" ]; then
     command -v kubetail > /dev/null
     if [ "$?" == "1" ]; then
@@ -36,11 +35,17 @@ elif [ "$runtime" == "kubernetes" ]; then
         echo "Please follow the instructions here https://github.com/johanhaleby/kubetail#installation, then try again"
     else
         if [ "$1" == "" ]; then
-            kubetail -n ${namespace} -f ${app_name}
+            CMD="kubetail -n ${namespace} -f ${app_name}"
         else
-            kubectl -n ${namespace} logs -f $(kubectl -n ${namespace} get pods | grep ${app_name}-$1 | cut -d ' ' -f 1)
+            CMD="kubectl -n ${namespace} logs -f $(kubectl -n ${namespace} get pods | grep ${app_name}-$1 | cut -d ' ' -f 1)"
         fi
     fi
 else
     echo "Runtime $runtime not recognized"
 fi
+
+if [ ! "$verbose" == "false" ]; then
+    echo -e "\n${CMD}\n"
+fi
+eval "${CMD}"
+

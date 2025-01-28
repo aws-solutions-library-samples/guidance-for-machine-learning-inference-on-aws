@@ -26,7 +26,11 @@ if [ "$1" == "" ]; then
 	if [ -f $dockerfile ]; then
 		echo "   ... for processor: $processor ..."
 		trace_opts=trace_opts_${processor}
-		docker run ${!trace_opts} -it --rm -v $(pwd)/2-trace:/app/trace -v $(pwd)/config.properties:/app/config.properties ${registry}${base_image_name}${base_image_tag} bash -c "cd /app/trace; python model-tracer.py"
+                CMD="docker run ${!trace_opts} -it --rm -v $(pwd)/2-trace:/app/trace -v $(pwd)/config.properties:/app/config.properties ${registry}${base_image_name}${base_image_tag} bash -c 'cd /app/trace; python --version; python model-tracer.py'"
+	        if [ ! "$verbose" == "false" ]; then
+                	echo -e "\n${CMD}\n"
+        	fi
+        	eval "${CMD}"	
 	else
 		echo "Processor $processor is not supported. Please ensure the processor setting in config.properties is configured properly"
 		exit 1

@@ -20,7 +20,16 @@ fi
 IMAGE=${model_image_name}
 REGISTRY_COUNT=$(aws ecr describe-repositories | grep ${IMAGE} | wc -l)
 if [ "$REGISTRY_COUNT" == "0" ]; then
-    aws ecr create-repository --repository-name ${IMAGE} --region ${region}
+    CMD="aws ecr create-repository --repository-name ${IMAGE} --region ${region}"
+    if [ ! "$verbose" == "false" ]; then
+        echo -e "\n${CMD}\n"
+    fi
+    eval "${CMD}"
 fi
 
-docker push ${registry}${model_image_name}${model_image_tag}
+CMD="docker push ${registry}${model_image_name}${model_image_tag}"
+if [ ! "$verbose" == "false" ]; then
+    echo -e "\n${CMD}\n"
+fi
+eval "${CMD}"
+

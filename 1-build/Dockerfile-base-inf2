@@ -24,8 +24,12 @@ RUN yum install -y aws-neuronx-collectives-${NEURONX_COLLECTIVES_LIB_VERSION} &&
     yum install -y aws-neuronx-runtime-lib-${NEURONX_RUNTIME_LIB_VERSION} && \
     yum install -y aws-neuronx-tools-${NEURONX_TOOLS_VERSION}
 ENV PATH="/opt/aws/neuron/bin:${PATH}"
-RUN echo 'alias python=python3.8' >> ~/.bashrc
-RUN echo 'alias pip=pip3.8' >> ~/.bashrc
+
+#fix for incorrect Python version configured by default in the base image
+RUN rm -f /usr/bin/python
+RUN ln -s /usr/bin/python3.8 /usr/bin/python3
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
 RUN update-alternatives --install /usr/bin/pip pip /usr/bin/pip3.8 1
 
 RUN pip3.8 install --extra-index-url https://pip.repos.neuron.amazonaws.com \

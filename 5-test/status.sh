@@ -19,18 +19,21 @@ echo "Processor: $processor"
 
 if [ "$runtime" == "docker" ]; then
     CMD="docker ps -a | grep ${test_image_name}-"
-    echo "$CMD"
-    eval "$CMD"
 elif [ "$runtime" == "kubernetes" ]; then
     if [ "$1" == "" ]; then
         echo ""
         echo "Pods:"
-        kubectl -n ${test_namespace} get pods
+        CMD="kubectl -n ${test_namespace} get pods"
     else
         echo ""
         echo "Pod:"
-        kubectl -n ${test_namespace} get pod $(kubectl -n ${test_namespace} get pods | grep ${test_image_name}-$1 | cut -d ' ' -f 1) -o wide
+        CMD="kubectl -n ${test_namespace} get pod $(kubectl -n ${test_namespace} get pods | grep ${test_image_name}-$1 | cut -d ' ' -f 1) -o wide"
     fi
 else
     echo "Runtime $runtime not recognized"
 fi
+if [ ! "$verbose" == "false" ]; then
+    echo -e "\n${CMD}\n"
+fi
+eval "${CMD}"
+

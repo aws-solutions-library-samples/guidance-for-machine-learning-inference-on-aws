@@ -28,16 +28,20 @@ if [ "$runtime" == "docker" ]; then
 	    run_opts="--device=/dev/neuron${server} ${run_opts}"
 	fi
     	CMD="docker run -d ${run_opts} ${registry}${model_image_name}${model_image_tag}"
-	if [ "$VERBOSE" == "true" ]; then
-    	    echo "$CMD"
-	fi
-    	eval "$CMD"
+        if [ ! "$verbose" == "false" ]; then
+            echo -e "\n${CMD}\n"
+        fi
+        eval "${CMD}"
 	server=$((server+1))
     done
 elif [ "$runtime" == "kubernetes" ]; then
     kubectl create namespace ${namespace} --dry-run=client -o yaml | kubectl apply -f -
     ./generate-yaml.sh
-    kubectl apply -f ${app_dir}
+    CMD="kubectl apply -f ${app_dir}"
+    if [ ! "$verbose" == "false" ]; then
+        echo -e "\n${CMD}\n"
+    fi
+    eval "${CMD}"
 else
     echo "Runtime $runtime not recognized"
 fi

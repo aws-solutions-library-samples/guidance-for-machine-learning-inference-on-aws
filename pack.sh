@@ -37,15 +37,10 @@ if [ "$action" == "" ]; then
     CMD="docker build -t ${registry}${model_image_name}${model_image_tag} --build-arg BASE_IMAGE=${BASE_MODEL_SERVER_IMAGE} \
                  --build-arg MODEL_NAME=${huggingface_model_name} --build-arg MODEL_FILE_NAME=${model_file_name} --build-arg PROCESSOR=${processor} \
                  --build-arg NUM_MODELS=${num_models} -f 3-pack/Dockerfile-${model_server} ."
-
-    if [ "$VERBOSE" == "true" ]; then
-	    echo ""
-	    echo "$CMD"
-	    echo ""
+    if [ ! "$verbose" == "false" ]; then
+        echo -e "\n${CMD}\n"
     fi
-
-    eval "$CMD"
-
+    eval "${CMD}"
 elif [ "$action" == "push" ]; then
     ./3-pack/push.sh
 elif [ "$action" == "pull" ]; then
