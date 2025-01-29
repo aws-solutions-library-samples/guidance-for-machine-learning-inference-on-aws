@@ -24,6 +24,11 @@ if [ -d ./${app_dir} ]; then
     rm -rf ./${app_dir}
 fi
 mkdir -p ./${app_dir}
+if [ "$target_platform" == "nim" ]; then
+	common_template=./nim-common-yaml.template
+	cat $common_template | envsubst > ./${app_dir}/01-nim-common.yaml
+	template=./nim-gpu-yaml.template
+fi
 
 instance=$instance_start
 while [ $instance -lt $instances ]

@@ -62,6 +62,9 @@ if __name__ == '__main__':
     elif model_server == 'triton':
         data = {"inputs":[{"name":"seq_0","shape":[1,1],"datatype":"BYTES","data":["What does the little engine say"]},{"name":"seq_1","shape":[1,1],"datatype":"BYTES","data":["In the childrens story about the little engine a small locomotive is pulling a large load up a mountain. Since the load is heavy and the engine is small it is not sure whether it will be able to do the job. This is a story about how an optimistic attitude empowers everyone to achieve more. In the story the little engine says: \"I think I can\" as it is pulling the heavy load all the way to the top of the mountain. On the way down it says: \"I thought I could\"."]}]}
         headers = {'Content-Type': 'application/json'}
+    elif model_server == 'nim':
+        data = {"messages": [ { "content": "You provide simple answers to questions about childrens books", "role": "system" }, { "content": "What does the little engine say?", "role": "user" } ], "model": "meta/llama3-8b-instruct", "max_tokens": 16, "top_p": 1, "n": 1, "stream": False, "stop": "\n", "frequency_penalty": 0.0 }
+        headers = {'accept': 'application/json', 'Content-Type': 'application/json'}
 
     live = True
     num_infer = 0
@@ -105,6 +108,8 @@ if __name__ == '__main__':
         if args.post:
             if model_server == "triton": 
                 result = session.post(pred_replace, headers=headers, data=json.dumps(feed_data))
+            elif model_server == "nim":
+                result = session.post(pred_replace, headers=headers, data=json.dumps(feed_data))
             else:
                 result = session.post(pred_replace, data=feed_data)
         else:
@@ -147,6 +152,8 @@ if __name__ == '__main__':
                 pred_replace = f"{urlparts.scheme}://{hostip}{port}{urlparts.path}"
             if args.post:
                 if model_server == "triton":
+                    result = session.post(pred_replace, headers=headers, data=json.dumps(feed_data))
+                elif model_server == "nim":
                     result = session.post(pred_replace, headers=headers, data=json.dumps(feed_data))
                 else:
                     result = session.post(pred_replace, data=feed_data)

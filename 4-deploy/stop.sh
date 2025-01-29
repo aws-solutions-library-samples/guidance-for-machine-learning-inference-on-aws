@@ -14,8 +14,15 @@ else
 fi
 
 echo ""
+echo "Platform: $target_platform"
 echo "Runtime: $runtime"
 echo "Processor: $processor"
+if [ "$target_platform" == "nim" ]; then
+	echo ""
+	echo "Deleting nim image pull secret ..."
+	kubectl -n ${namespace} delete secret nvcrimagepullsecret
+fi
+	
 
 if [ "$runtime" == "docker" ]; then
     server=0

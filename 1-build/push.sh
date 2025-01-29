@@ -18,7 +18,7 @@ fi
 ./login.sh
 # Create registry if needed
 IMAGE=${base_image_name}
-REGISTRY_COUNT=$(aws ecr describe-repositories | grep ${IMAGE} | wc -l)
+REGISTRY_COUNT=$(aws ecr describe-repositories | grep \"${IMAGE}\" | wc -l | xargs)
 if [ "$REGISTRY_COUNT" == "0" ]; then
     CMD="aws ecr create-repository --repository-name ${IMAGE} --region ${region}"
     if [ ! "$verbose" == "false" ]; then

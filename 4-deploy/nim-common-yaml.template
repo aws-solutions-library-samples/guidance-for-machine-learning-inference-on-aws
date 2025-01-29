@@ -1,0 +1,109 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ngc-api
+  namespace: ${namespace}
+type: Opaque
+data:
+  NGC_CLI_API_KEY: ${nim_api_key_b64}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-nim-scripts-configmap
+  namespace: ${namespace}
+data:
+  ngc_pull.sh: |-
+    #!/bin/bash
+
+    set -euo pipefail
+    echo "Starting NGC download script. Note: only glibc-based Linux works with NGC CLI -- NOT busybox or alpine"
+
+    if [ "${dollar}DOWNLOAD_NGC_CLI" = "true" ]; then
+      NGC_WD="${dollar}{DOWNLOAD_NGC_CLI_PATH:-/tmp}"
+      if [ ! -x "${dollar}(which wget)" ]; then
+        echo "To install ngc in the download image, wget is required"
+        exit 1
+      fi
+      wget "https://api.ngc.nvidia.com/v2/resources/nvidia/ngc-apps/ngc_cli/versions/${dollar}{NGC_CLI_VERSION}/files/ngccli_linux.zip" -O "${dollar}NGC_WD/ngccli_linux.zip"
+      cd "${dollar}NGC_WD" && unzip ngccli_linux.zip
+      chmod u+x ngc-cli/ngc
+      NGC_EXE=${dollar}NGC_WD/ngc-cli/ngc
+      export PATH=${dollar}PATH:${dollar}NGC_WD/ngc-cli
+    fi
+
+    # To ensure we actually have an NGC binary, switch to full path if default is used
+    if [ "${dollar}NGC_EXE" = "ngc" ]; then
+      NGC_EXE=${dollar}(which ngc)
+    fi
+    
+    # check if ngc cli is truly available at this point
+    if [ ! -x "${dollar}NGC_EXE" ]; then
+      echo "ngc cli is not installed or available!"
+      exit 1
+    fi
+    
+    # download the model
+    directory="${dollar}{STORE_MOUNT_PATH}/${dollar}{NGC_MODEL_NAME}_v${dollar}{NGC_MODEL_VERSION}"
+    echo "Directory is ${dollar}directory"
+    ready_file="${dollar}directory/.ready"
+    lockdir="${dollar}directory/.lock"
+    mkdir -p "${dollar}directory"
+    set -o noclobber &&
+    if { mkdir "${dollar}lockdir"; }; then
+      trap 'rm -f ${dollar}lockdir' EXIT
+      if [ ! -e "${dollar}ready_file" ]; then
+        ${dollar}NGC_EXE registry model download-version --dest "${dollar}STORE_MOUNT_PATH" "${dollar}{NGC_CLI_ORG}/${dollar}{NGC_CLI_TEAM}/${dollar}{NGC_MODEL_NAME}:${dollar}{NGC_MODEL_VERSION}"
+        # decrypt the model - if needed (conditions met)
+        if [ -n "${dollar}{NGC_DECRYPT_KEY:+''}" ] && [ -f "${dollar}directory/${dollar}{MODEL_NAME}.enc" ]; then
+          echo "Decrypting ${dollar}directory/${dollar}{MODEL_NAME}.enc"
+          # untar if necessary
+          if [ -n "${dollar}{TARFILE:+''}" ]; then
+            echo "TARFILE enabled, unarchiving..."
+            openssl enc -aes-256-cbc -d -pbkdf2 -in "${dollar}directory/${dollar}{MODEL_NAME}.enc" -out "${dollar}directory/${dollar}{MODEL_NAME}.tar" -k "${dollar}{NGC_DECRYPT_KEY}"
+            tar -xvf "${dollar}directory/${dollar}{MODEL_NAME}.tar" -C "${dollar}STORE_MOUNT_PATH"
+            rm "${dollar}directory/${dollar}{MODEL_NAME}.tar"
+          else
+            openssl enc -aes-256-cbc -d -pbkdf2 -in "${dollar}directory/${dollar}{MODEL_NAME}.enc" -out "${dollar}directory/${dollar}{MODEL_NAME}" -k "${dollar}{NGC_DECRYPT_KEY}"
+          fi
+          rm "${dollar}directory/${dollar}{MODEL_NAME}.enc"
+        else
+          echo "No decryption key provided, or encrypted file found. Skipping decryption.";
+          if [ -n "${dollar}{TARFILE:+''}" ]; then
+            echo "TARFILE enabled, unarchiving..."
+            tar -xvf "${dollar}directory/${dollar}{NGC_MODEL_VERSION}.tar.gz" -C "${dollar}STORE_MOUNT_PATH"
+            rm "${dollar}directory/${dollar}{NGC_MODEL_VERSION}.tar.gz"
+          fi
+        fi
+        touch "${dollar}ready_file"
+        echo "Done dowloading"
+        rmdir "${dollar}lockdir"
+      else
+        echo "Download was already complete"
+      fi;
+    else
+      while [ ! -e "${dollar}ready_file" ]
+      do
+        echo "Did not get the download lock. Waiting for the pod holding the lock to download the files."
+        sleep 1
+      done;
+      echo "Done waiting"
+    fi
+    set +o noclobber;
+    ls -la "${dollar}directory"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: model-store
+  namespace: ${namespace}
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 50Gi
+  storageClassName: efs-sc
+  volumeMode: Filesystem
+

@@ -58,9 +58,12 @@ do
 		echo "Request: $request, Server: $server, IP: $server_ip,  Model: $fastapi_model_name"
 		./clock.sh ./fastapi-infer.sh ${server_ip} ${fastapi_model_name}
 	elif [ "${model_server}" == "triton" ]; then
-	    triton_model_name=${huggingface_model_name}-$((model+1))
+		triton_model_name=${huggingface_model_name}-$((model+1))
 		echo "Request: $request, Server: $server, IP: $server_ip,  Model: $triton_model_name"
 		./clock.sh ./triton-infer.sh ${server_ip} ${triton_model_name} ${service_port}
+	elif [ "${model_server}" == "nim" ]; then
+		echo "Request: $request, Server: $server, IP: $server_ip, Model: $nim_model_name"
+		./clock.sh ./nim-infer.sh ${server_ip} ${nim_model_name} ${service_port}
 	else
 		echo "Unrecognized model server: ${model_server}"
 	fi

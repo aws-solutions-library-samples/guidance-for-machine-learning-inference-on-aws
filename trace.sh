@@ -19,21 +19,25 @@ print_help() {
 if [ "$1" == "" ]; then 
 	source ./config.properties
 	echo ""
-	echo "Tracing model: $huggingface_model_name ..."
-	
-	dockerfile=./1-build/Dockerfile-base-${processor}
-	echo ""
-	if [ -f $dockerfile ]; then
-		echo "   ... for processor: $processor ..."
-		trace_opts=trace_opts_${processor}
-                CMD="docker run ${!trace_opts} -it --rm -v $(pwd)/2-trace:/app/trace -v $(pwd)/config.properties:/app/config.properties ${registry}${base_image_name}${base_image_tag} bash -c 'cd /app/trace; python --version; python model-tracer.py'"
-	        if [ ! "$verbose" == "false" ]; then
-                	echo -e "\n${CMD}\n"
-        	fi
-        	eval "${CMD}"	
+	if [ "$target_platform" == "nim" ]; then
+		echo "NIM containers do not require tracing. Please proceed directly to deployment."
 	else
-		echo "Processor $processor is not supported. Please ensure the processor setting in config.properties is configured properly"
-		exit 1
+		echo "Tracing model: $huggingface_model_name ..."
+	
+		dockerfile=./1-build/Dockerfile-base-${processor}
+		echo ""
+		if [ -f $dockerfile ]; then
+			echo "   ... for processor: $processor ..."
+			trace_opts=trace_opts_${processor}
+                	CMD="docker run ${!trace_opts} -it --rm -v $(pwd)/2-trace:/app/trace -v $(pwd)/config.properties:/app/config.properties ${registry}${base_image_name}${base_image_tag} bash -c 'cd /app/trace; python --version; python model-tracer.py'"
+	        	if [ ! "$verbose" == "false" ]; then
+                		echo -e "\n${CMD}\n"
+        		fi
+        		eval "${CMD}"	
+		else
+			echo "Processor $processor is not supported. Please ensure the processor setting in config.properties is configured properly"
+			exit 1
+		fi
 	fi
 else
 	print_help

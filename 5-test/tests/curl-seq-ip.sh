@@ -60,6 +60,9 @@ do
 		    triton_model_name=${huggingface_model_name}-$((model+1))
 		    echo "Request: $request, Server: $server, IP: $endpoint_ip, Model: $triton_model_name"
 		    ./clock.sh ./triton-infer.sh ${endpoint_ip} ${triton_model_name} ${service_port}
+		elif [ "${model_server}" == "nim" ]; then
+		    echo "Request: $request, Server: $server, IP: $endpoint_ip, Model: $nim_model_name"
+		    ./clock.sh ./nim-infer.sh ${endpoint_ip} ${nim_model_name} ${service_port}
 		else
 		    echo "Unrecognized model server: ${model_server}"
 		fi

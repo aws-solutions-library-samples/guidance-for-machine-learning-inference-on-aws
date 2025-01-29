@@ -24,6 +24,8 @@ spec:
         command: ["bash","-c","${cmd_pod}"]
         imagePullPolicy: Always
         env:
+        - name: target_platform
+          value: "$target_platform"
         - name: runtime
           value: "$runtime"
         - name: num_servers

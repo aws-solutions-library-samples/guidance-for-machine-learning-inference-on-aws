@@ -1,0 +1,129 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${instance_name}
+  namespace: ${namespace}
+  labels:
+    app: ${instance_name}
+spec:
+  ports:
+  - name: preds
+    port: 8000
+    targetPort: pod-port 
+  type: ClusterIP
+  selector:
+    app: ${instance_name}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${instance_name}
+  namespace: ${namespace}
+  labels:
+    app: ${instance_name}
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ${instance_name}
+  template:
+    metadata:
+      labels:
+        app: ${instance_name}
+    spec:
+      nodeSelector:
+        node.kubernetes.io/instance-type: "${instance_type}"
+      imagePullSecrets:
+      - name: nvcrimagepullsecret
+      containers:
+      - name: main
+        image: "${nim_registry}${model_image_name}${model_image_tag}"
+        imagePullPolicy: Always
+        env:
+          - name: NUM_MODELS
+            value: "${num_models}"
+          - name: POSTPROCESS
+            value: "${postprocess}"
+          - name: QUIET
+            value: "${quiet}"
+          - name: NIM_CACHE_PATH
+            value: /model-store
+          - name: NGC_API_KEY
+            valueFrom:
+              secretKeyRef:
+                key: NGC_CLI_API_KEY
+                name: ngc-api
+          - name: NIM_SERVER_PORT
+            value: "8000"
+          - name: NIM_JSONL_LOGGING
+            value: "1"
+          - name: NIM_LOG_LEVEL
+            value: INFO
+          - name: LD_LIBRARY_PATH
+            value: /usr/local/lib/python3.10/dist-packages/tensorrt_llm/libs:/usr/local/lib/python3.10/dist-packages/nvidia/cublas/lib:/usr/local/lib/python3.10/dist-packages/tensorrt_libs
+        ports:
+        - name: pod-port
+          containerPort: 8000
+          protocol: TCP
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /v1/health/live
+            port: pod-port
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /v1/health/ready
+            port: pod-port
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        startupProbe:
+          failureThreshold: 180
+          httpGet:
+            path: /v1/health/ready
+            port: pod-port
+            scheme: HTTP
+          initialDelaySeconds: 40
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          limits:
+            nvidia.com/gpu: 1
+        volumeMounts:
+        - mountPath: /model-store
+          name: model-store
+        - mountPath: /dev/shm
+          name: dshm
+        - mountPath: /scripts
+          name: scripts-volume
+      dnsPolicy: ClusterFirst
+      schedulerName: default-scheduler
+      securityContext:
+        fsGroup: 1000
+        runAsGroup: 1000
+        runAsUser: 1000
+      serviceAccount: default
+      serviceAccountName: default
+      terminationGracePeriodSeconds: 60
+      volumes:
+      - emptyDir:
+          medium: Memory
+        name: dshm
+      - configMap:
+          defaultMode: 365
+          name: my-nim-scripts-configmap
+        name: scripts-volume
+      - name: model-store
+        persistentVolumeClaim:
+          claimName: model-store
