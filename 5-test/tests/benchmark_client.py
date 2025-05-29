@@ -61,7 +61,7 @@ if __name__ == '__main__':
                 'seq_1': """The number 42 is, in The Hitchhiker's Guide to the Galaxy by Douglas Adams."""}
     elif model_server == 'triton':
         data = {"inputs":[{"name":"seq_0","shape":[1,1],"datatype":"BYTES","data":["What does the little engine say"]},{"name":"seq_1","shape":[1,1],"datatype":"BYTES","data":["In the childrens story about the little engine a small locomotive is pulling a large load up a mountain. Since the load is heavy and the engine is small it is not sure whether it will be able to do the job. This is a story about how an optimistic attitude empowers everyone to achieve more. In the story the little engine says: \"I think I can\" as it is pulling the heavy load all the way to the top of the mountain. On the way down it says: \"I thought I could\"."]}]}
-        headers = {'Content-Type': 'application/json'}
+        headers = {'Content-Type': 'application/json', 'Host': 'bert.do.aws.dev'}
     elif model_server == 'nim':
         data = {"messages": [ { "content": "You provide simple answers to questions about childrens books", "role": "system" }, { "content": "What does the little engine say?", "role": "user" } ], "model": "meta/llama3-8b-instruct", "max_tokens": 16, "top_p": 1, "n": 1, "stream": False, "stop": "\n", "frequency_penalty": 0.0 }
         headers = {'accept': 'application/json', 'Content-Type': 'application/json'}
